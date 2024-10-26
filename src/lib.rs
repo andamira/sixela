@@ -1,3 +1,11 @@
+// sixela::lib
+//
+//! Sixel in pure rust.
+//
+
+//* global config *//
+//
+// lints
 #![deny(
     // WAIT: [lazy_type_alias](https://github.com/rust-lang/rust/issues/112792)
     type_alias_bounds, // detects bounds in type aliases
@@ -21,9 +29,6 @@
     clippy::manual_string_new, // usage of "" to create a String
     clippy::map_unwrap_or, // usage of result|option.map(_).unwrap_or[_else](_)
     clippy::ptr_cast_constness, // as casts between raw pointers that change their constness
-    // not compatible with the iif! macro without being able to ignore it in an expression:
-    // WAIT: [stmt_expr_attributes](https://github.com/rust-lang/rust/issues/15701)
-    // clippy::redundant_else, // else blocks that can be removed without changing semantics
     clippy::same_functions_in_if_condition, // consecutive ifs with the same function call
     clippy::semicolon_if_nothing_returned, // expression returns () not followed by a semicolon
     clippy::single_match_else, // matches with two arms where an if let else will usually suffice
@@ -40,6 +45,19 @@
     clippy::upper_case_acronyms,
     dead_code,
 )]
+//
+// nightly, safety, environment
+#![cfg_attr(feature = "nightly", feature(doc_cfg))]
+#![cfg_attr(feature = "safe", forbid(unsafe_code))]
+#![cfg_attr(not(feature = "std"), no_std)]
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
+// safeguarding: environment, safety
+#[cfg(all(feature = "std", feature = "no_std"))]
+compile_error!("You can't enable the `std` and `no_std` features at the same time.");
+#[cfg(all(feature = "safe", feature = "unsafe"))]
+compile_error!("You can't enable `safe` and `unsafe*` features at the same time.");
 
 use std::error::Error;
 

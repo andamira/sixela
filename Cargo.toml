@@ -43,7 +43,7 @@ nightly = [
 
 # capabilities
 # ------------------------------
-default = ["alloc"] # for now, almost everything depends on alloc
+default = ["std"] # for now, almost everything depends on alloc
 
 [dependencies]
 # ==============================================================================
