@@ -1,13 +1,55 @@
-workspace = { members = ["sixel_test"] }
 [package]
-name = "icy_sixel"
-version = "0.1.2"
-edition = "2021"
-authors = ["Mike Krüger <mkrueger@posteo.de>"]
+name = "sixela"
 description = "A 100% rust sixel library."
-homepage = "https://github.com/mkrueger/icy_sixel"
-repository = "https://github.com/mkrueger/icy_sixel"
-license-file = "LICENSE"
+version = "0.2.0-wip"
+edition = "2021"
+rust-version = "1.82.0"
+authors = ["José Luis Cruz <joseluis@andamira.net>"]
+repository = "https://github.com/andamira/sixela"
+documentation = "https://docs.rs/sixela"
+license = "MIT OR Apache-2.0"
+include = [
+	"/Cargo.toml",
+	"/DOCS/*", "/LICENSE*",
+	"/src/**/*.rs", "/src/**/*.md",
+]
+categories = ["rendering::graphics-api", "no-std"]
 keywords = ["sixel"]
+publish = true
+
+
+[features] # 8/300 (292 remaining), 8 visible, 0 hidden
+# ==============================================================================
+
+# environment
+# ------------------------------
+std = []
+alloc = []
+no_std = []
+
+# safety
+# ------------------------------
+safe = []
+unsafe = []
+
+# nightly
+# ------------------------------
+nightly = [
+	"nightly_doc",
+] # enables all the following features:
+	# WAIT: [doc_cfg](https://github.com/rust-lang/rust/issues/43781)
+	# WAIT: [doc_notable_trait](https://github.com/rust-lang/rust/issues/45040)
+	nightly_doc = []
+
+# capabilities
+# ------------------------------
+default = ["alloc"] # for now, almost everything depends on alloc
 
 [dependencies]
+# ==============================================================================
+
+
+[package.metadata.docs.rs]
+# ==============================================================================
+no-default-features = true
+features = ["_docsrs"]
