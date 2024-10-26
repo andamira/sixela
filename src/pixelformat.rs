@@ -27,11 +27,7 @@ pub fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, 
             ((pixels >> 5) & 0x3f) << 2,
             ((pixels >> 0) & 0x1f) << 3,
         ),
-        PixelFormat::RGB888 => (
-            (pixels >> 16) & 0xff,
-            (pixels >> 8) & 0xff,
-            (pixels >> 0) & 0xff,
-        ),
+        PixelFormat::RGB888 => ((pixels >> 16) & 0xff, (pixels >> 8) & 0xff, (pixels >> 0) & 0xff),
         PixelFormat::BGR555 => (
             ((pixels >> 0) & 0x1f) << 3,
             ((pixels >> 5) & 0x1f) << 3,
@@ -42,37 +38,21 @@ pub fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, 
             ((pixels >> 5) & 0x3f) << 2,
             ((pixels >> 11) & 0x1f) << 3,
         ),
-        PixelFormat::BGR888 => (
-            (pixels >> 0) & 0xff,
-            (pixels >> 8) & 0xff,
-            (pixels >> 16) & 0xff,
-        ),
-        PixelFormat::ARGB8888 => (
-            (pixels >> 16) & 0xff,
-            (pixels >> 8) & 0xff,
-            (pixels >> 0) & 0xff,
-        ),
-        PixelFormat::RGBA8888 => (
-            (pixels >> 24) & 0xff,
-            (pixels >> 16) & 0xff,
-            (pixels >> 8) & 0xff,
-        ),
-        PixelFormat::ABGR8888 => (
-            (pixels >> 0) & 0xff,
-            (pixels >> 8) & 0xff,
-            (pixels >> 16) & 0xff,
-        ),
-        PixelFormat::BGRA8888 => (
-            (pixels >> 8) & 0xff,
-            (pixels >> 16) & 0xff,
-            (pixels >> 24) & 0xff,
-        ),
+        PixelFormat::BGR888 => ((pixels >> 0) & 0xff, (pixels >> 8) & 0xff, (pixels >> 16) & 0xff),
+        PixelFormat::ARGB8888 => {
+            ((pixels >> 16) & 0xff, (pixels >> 8) & 0xff, (pixels >> 0) & 0xff)
+        }
+        PixelFormat::RGBA8888 => {
+            ((pixels >> 24) & 0xff, (pixels >> 16) & 0xff, (pixels >> 8) & 0xff)
+        }
+        PixelFormat::ABGR8888 => {
+            ((pixels >> 0) & 0xff, (pixels >> 8) & 0xff, (pixels >> 16) & 0xff)
+        }
+        PixelFormat::BGRA8888 => {
+            ((pixels >> 8) & 0xff, (pixels >> 16) & 0xff, (pixels >> 24) & 0xff)
+        }
         PixelFormat::G8 | PixelFormat::AG88 => (pixels & 0xff, pixels & 0xff, pixels & 0xff),
-        PixelFormat::GA88 => (
-            (pixels >> 8) & 0xff,
-            (pixels >> 8) & 0xff,
-            (pixels >> 8) & 0xff,
-        ),
+        PixelFormat::GA88 => ((pixels >> 8) & 0xff, (pixels >> 8) & 0xff, (pixels >> 8) & 0xff),
         _ => (0, 0, 0),
     };
     (r as u8, g as u8, b as u8)

@@ -77,26 +77,13 @@ fn sumcompare(b1: &bbox, b2: &bbox) -> Ordering {
 pub fn newColorMap(newcolors: i32, depth: i32) -> HashMap<i32, Tuple> {
     let mut colormap = HashMap::new();
     for i in 0..newcolors {
-        colormap.insert(
-            i,
-            Tuple {
-                value: 0,
-                tuple: vec![0; depth as usize],
-            },
-        );
+        colormap.insert(i, Tuple { value: 0, tuple: vec![0; depth as usize] });
     }
     colormap
 }
 
 fn newBoxVector(colors: i32, sum: i32, newcolors: i32) -> Vec<bbox> {
-    let mut result = vec![
-        bbox {
-            ind: 0,
-            colors: 0,
-            sum: 0
-        };
-        newcolors as usize
-    ];
+    let mut result = vec![bbox { ind: 0, colors: 0, sum: 0 }; newcolors as usize];
 
     /* Set up the initial box. */
     result[0].ind = 0;
@@ -315,14 +302,7 @@ fn splitBox(
 
     /* assert(max_depth >= depth); */
 
-    findBoxBoundaries(
-        colorfreqtable,
-        depth,
-        boxStart,
-        boxSize,
-        &mut minval,
-        &mut maxval,
-    );
+    findBoxBoundaries(colorfreqtable, depth, boxStart, boxSize, &mut minval, &mut maxval);
 
     /* Find the largest dimension, and sort by that component.  I have
        included two methods for determining the "largest" dimension;
@@ -412,14 +392,7 @@ pub fn mediancut(
         if bi >= boxes {
             multicolorBoxesExist = false;
         } else {
-            splitBox(
-                &mut bv,
-                &mut boxes,
-                bi as usize,
-                colorfreqtable,
-                depth,
-                methodForLargest,
-            )?;
+            splitBox(&mut bv, &mut boxes, bi as usize, colorfreqtable, depth, methodForLargest)?;
         }
     }
     *colormapP = colormapFromBv(newcolors, &bv, boxes, colorfreqtable, depth, methodForRep);
@@ -491,13 +464,7 @@ pub fn computeHistogram(
             for n in 0..depth {
                 tuple[(depth - 1 - n) as usize] = ((memory[it] >> (n * 5) & 0x1f) << 3) as i32;
             }
-            colorfreqtable.insert(
-                i as i32,
-                Tuple {
-                    value: histogram[memory[i]],
-                    tuple,
-                },
-            );
+            colorfreqtable.insert(i as i32, Tuple { value: histogram[memory[i]], tuple });
         }
         it += 1;
     }
