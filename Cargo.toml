@@ -23,14 +23,17 @@ publish = true
 
 # environment
 # ------------------------------
-std = []
-alloc = []
-no_std = []
+std = ["alloc", "devela/std"]
+alloc = ["devela/alloc"]
+no_std = ["devela/libm"]
+#no_std = ["devela/dep_libm"]#WIP
 
 # safety
 # ------------------------------
 safe = []
+safest = ["devela/safe"]
 unsafe = []
+unsafest = ["devela/unsafe"]
 
 # nightly
 # ------------------------------
@@ -47,6 +50,8 @@ default = ["std"] # for now, almost everything depends on alloc
 
 [dependencies]
 # ==============================================================================
+devela = { version = "0.21.2", features = [] }
+#devela = { version = "0.22.0-wip", path = "../devela", features = [] }#WIP
 
 
 [package.metadata.docs.rs]
