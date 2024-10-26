@@ -59,16 +59,17 @@ compile_error!("You can't enable the `std` and `no_std` features at the same tim
 #[cfg(all(feature = "safe", feature = "unsafe"))]
 compile_error!("You can't enable `safe` and `unsafe*` features at the same time.");
 
-use std::error::Error;
-
-use dither::sixel_dither;
-use output::sixel_output;
+mod error;
+pub use error::*;
 
 pub mod dither;
 pub mod output;
 pub mod pixelformat;
 pub mod quant;
 pub mod tosixel;
+
+use dither::sixel_dither;
+use output::sixel_output;
 
 /* limitations */
 const SIXEL_OUTPUT_PACKET_SIZE: usize = 16_384;
