@@ -1,8 +1,4 @@
-/*****************************************************************************
- *
- * quantization
- *
- *****************************************************************************/
+// quantization
 
 use crate::{
     pixelformat::sixel_helper_compute_depth, DiffusionMethod, MethodForLargest, MethodForRep,
@@ -473,7 +469,7 @@ pub fn computeHistogram(
     Ok(colorfreqtable)
 }
 
-#[allow(clippy::too_many_arguments)]
+#[expect(clippy::too_many_arguments)]
 pub fn computeColorMapFromInput(
     data: &[u8],
     length: i32,
@@ -831,8 +827,8 @@ pub fn lookup_mono_lightbg(
     i32::from(distant < 128 * reqcolor)
 }
 
-/* choose colors using median-cut method */
-#[allow(clippy::too_many_arguments)]
+// Choose colors using median-cut method
+#[expect(clippy::too_many_arguments)]
 pub fn sixel_quant_make_palette(
     data: &[u8],
     length: i32,
@@ -845,10 +841,7 @@ pub fn sixel_quant_make_palette(
     qualityMode: Quality,
 ) -> SixelResult<Vec<u8>> {
     let result_depth = sixel_helper_compute_depth(pixelformat);
-    /*if (result_depth <= 0) {
-        *result = NULL;
-        goto end;
-    }*/
+    // if (result_depth <= 0) { *result = NULL; goto end; }
 
     let depth = result_depth as usize;
     let mut colormap = HashMap::new();
@@ -873,8 +866,8 @@ pub fn sixel_quant_make_palette(
     Ok(result)
 }
 
-/* apply color palette into specified pixel buffers */
-#[allow(clippy::too_many_arguments)]
+// Apply color palette into specified pixel buffers
+#[expect(clippy::too_many_arguments)]
 pub fn sixel_quant_apply_palette(
     result: &mut [u8],
     data: &mut [u8],
@@ -893,7 +886,7 @@ pub fn sixel_quant_apply_palette(
     /* check bad reqcolor */
     if reqcolor < 1 {
         /*
-                sixel_helper_set_additional_message(
+            sixel_helper_set_additional_message(
             "sixel_quant_apply_palette: "
             "a bad argument is detected, reqcolor < 0.");
         */
