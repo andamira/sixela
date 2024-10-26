@@ -6,7 +6,7 @@ use devela::{Box, Error};
 pub type SixelResult<T> = Result<T, Box<dyn Error>>; // TODO: IMPROVE
 
 /// A sixel-related error.
-#[derive(Debug, Clone)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum SixelError {
     /// Runtime error.
     RuntimeError,

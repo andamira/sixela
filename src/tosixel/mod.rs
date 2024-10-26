@@ -4,7 +4,7 @@ use alloc::{format, vec};
 use devela::{Box, Vec, Write as IoWrite};
 
 use crate::{
-    dither::sixel_dither,
+    dither::DitherConf,
     output::{sixel_node, sixel_output},
     pixelformat::sixel_helper_normalize_pixelformat,
     EncodePolicy, PaletteType, PixelFormat, SixelError, SixelResult, SIXEL_OUTPUT_PACKET_SIZE,
@@ -335,7 +335,7 @@ impl<W: IoWrite> sixel_output<W> {
         let mut pix;
 
         for y in 0..height {
-            if self.encode_policy != EncodePolicy::SIZE {
+            if self.encode_policy != EncodePolicy::Size {
                 fillable = false;
             } else if palstate.is_some() {
                 /* high color sixel */
@@ -518,7 +518,7 @@ impl<W: IoWrite> sixel_output<W> {
         pixels: &[u8],
         width: i32,
         height: i32,
-        dither: &mut sixel_dither,
+        dither: &mut DitherConf,
     ) -> SixelResult<()> {
         let input_pixels = match dither.pixelformat {
             PixelFormat::PAL1
@@ -567,7 +567,7 @@ impl<W: IoWrite> sixel_output<W> {
         pixels: &mut [u8],
         width: i32,
         mut height: i32,
-        dither: &mut sixel_dither,
+        dither: &mut DitherConf,
     ) -> SixelResult<()> {
         let maxcolors = 1 << 15;
         let mut px_idx = 0;
@@ -756,7 +756,7 @@ impl<W: IoWrite> sixel_output<W> {
         width: i32,
         height: i32,
         _depth: i32, /* color depth */
-        dither: &mut sixel_dither,
+        dither: &mut DitherConf,
     ) -> SixelResult<()> /* output context */ {
         /*
             println!("sixel_encode: {} x {} depth {}", width, height, _depth);
@@ -795,13 +795,13 @@ impl<W: IoWrite> sixel_output<W> {
             goto end;*/
         }
         match dither.quality_mode {
-            crate::Quality::AUTO
-            | crate::Quality::HIGH
-            | crate::Quality::LOW
-            | crate::Quality::FULL => {
+            crate::Quality::Auto
+            | crate::Quality::High
+            | crate::Quality::Low
+            | crate::Quality::Full => {
                 self.encode_dither(pixels, width, height, dither)?;
             }
-            crate::Quality::HIGHCOLOR => {
+            crate::Quality::HighColor => {
                 self.encode_highcolor(pixels, width, height, dither)?;
             }
         }

@@ -1,4 +1,4 @@
-// quantization
+// sixela::quant
 
 use crate::{
     pixelformat::sixel_helper_compute_depth, DiffusionMethod, MethodForLargest, MethodForRep,
@@ -419,9 +419,9 @@ pub fn computeHistogram(
     qualityMode: Quality,
 ) -> SixelResult<HashMap<i32, Tuple>> {
     let (max_sample, mut step) = match qualityMode {
-        Quality::LOW => (18_383, length / depth / 18_383 * depth),
-        Quality::HIGH => (18_383, length / depth / 18_383 * depth),
-        Quality::AUTO | Quality::HIGHCOLOR | Quality::FULL => {
+        Quality::Low => (18_383, length / depth / 18_383 * depth),
+        Quality::High => (18_383, length / depth / 18_383 * depth),
+        Quality::Auto | Quality::HighColor | Quality::Full => {
             (4_003_079, length / depth / 4_003_079 * depth)
         }
     };

@@ -1,3 +1,5 @@
+// sixela::output
+
 use crate::{EncodePolicy, PaletteType};
 use devela::{sys::Write as IoWrite, String, Vec};
 
@@ -66,7 +68,7 @@ impl<W: IoWrite> sixel_output<W> {
             active_palette: -1,
             nodes: Vec::new(),
             penetrate_multiplexer: false,
-            encode_policy: EncodePolicy::AUTO,
+            encode_policy: EncodePolicy::Auto,
             has_sixel_scrolling: false,
             buffer: String::new(),
         }

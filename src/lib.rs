@@ -68,8 +68,6 @@ pub mod output;
 pub mod pixelformat;
 pub mod quant;
 
-// pub use error::*;
-
 /// All items are flat re-exported here. <br/><hr>
 pub mod all {
     #[doc(inline)]

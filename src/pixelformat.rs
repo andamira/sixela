@@ -1,3 +1,5 @@
+// sixela::pixelformat
+
 use crate::{PixelFormat, SixelError, SixelResult};
 use devela::Box;
 
