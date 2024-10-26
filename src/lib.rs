@@ -59,6 +59,8 @@ compile_error!("You can't enable the `std` and `no_std` features at the same tim
 #[cfg(all(feature = "safe", feature = "unsafe"))]
 compile_error!("You can't enable `safe` and `unsafe*` features at the same time.");
 
+use devela::{String, ToString, Vec};
+
 mod error;
 pub use error::*;
 

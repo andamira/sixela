@@ -1,4 +1,5 @@
-use std::vec;
+use alloc::vec;
+use devela::{Box, Vec};
 
 use crate::{
     pixelformat::sixel_helper_normalize_pixelformat,

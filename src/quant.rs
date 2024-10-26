@@ -4,8 +4,12 @@
  *
  *****************************************************************************/
 
-use std::cmp::Ordering;
-use std::vec;
+use crate::{
+    pixelformat::sixel_helper_compute_depth, DiffusionMethod, MethodForLargest, MethodForRep,
+    PixelFormat, Quality, SixelError, SixelResult,
+};
+use alloc::vec;
+use devela::{AllocMap as HashMap, Box, Ordering, Vec};
 
 #[derive(Clone)]
 struct bbox {
@@ -718,13 +722,6 @@ pub fn mask_a(x: i32, y: i32, c: i32) -> f32 {
 pub fn mask_x(x: i32, y: i32, c: i32) -> f32 {
     ((((x + c * 29) ^ (y * 149)) * 1234) & 511) as f32 / 256.0 - 1.0
 }
-
-use std::collections::HashMap;
-
-use crate::{
-    pixelformat::sixel_helper_compute_depth, MethodForLargest, PixelFormat, Quality, SixelResult,
-};
-use crate::{DiffusionMethod, MethodForRep, SixelError};
 
 /* lookup closest color from palette with "normal" strategy */
 pub fn lookup_normal(

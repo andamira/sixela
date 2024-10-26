@@ -1,6 +1,5 @@
-use std::io::Write;
-
 use crate::{EncodePolicy, PaletteType};
+use devela::{sys::Write as IoWrite, String, Vec};
 
 #[derive(Default, PartialEq)]
 pub struct sixel_node {
@@ -10,7 +9,7 @@ pub struct sixel_node {
     pub map: Vec<u8>,
 }
 
-pub struct sixel_output<W: Write> {
+pub struct sixel_output<W: IoWrite> {
     /* compatiblity flags */
 
     /* 0: 7bit terminal,
@@ -52,7 +51,7 @@ pub struct sixel_output<W: Write> {
     pub buffer: String,
 }
 
-impl<W: Write> sixel_output<W> {
+impl<W: IoWrite> sixel_output<W> {
     /// create new output context object
     pub fn new(fn_write: W) -> Self {
         Self {

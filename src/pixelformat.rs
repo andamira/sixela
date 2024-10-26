@@ -1,4 +1,5 @@
 use crate::{PixelFormat, SixelError, SixelResult};
+use devela::Box;
 
 pub fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, u8) {
     let mut count = 0;

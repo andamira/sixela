@@ -1,4 +1,5 @@
-use std::io::Write;
+use alloc::{format, vec};
+use devela::{Box, Vec, Write as IoWrite};
 
 use crate::{
     dither::sixel_dither,
@@ -22,7 +23,7 @@ enum Palette {
 
 /* implementation */
 
-impl<W: Write> sixel_output<W> {
+impl<W: IoWrite> sixel_output<W> {
     /* GNU Screen penetration */
     fn penetrate(
         &mut self,
@@ -942,7 +943,7 @@ fn sixel_apply_15bpp_dither(
 
 const PALETTE_HIT: i32 = 1;
 const PALETTE_CHANGE: i32 = 2;
-impl<W: Write> sixel_output<W> {
+impl<W: IoWrite> sixel_output<W> {
     pub fn encode_highcolor(
         &mut self,
         pixels: &mut [u8],
