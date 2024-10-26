@@ -1,4 +1,3 @@
-#![allow(clippy::erasing_op)]
 /*****************************************************************************
  *
  * quantization
@@ -6,7 +5,6 @@
  *****************************************************************************/
 
 use std::cmp::Ordering;
-use std::os::unix::raw::nlink_t;
 use std::vec;
 
 #[derive(Clone)]
@@ -421,10 +419,10 @@ pub fn computeHistogram(
     qualityMode: Quality,
 ) -> SixelResult<HashMap<i32, Tuple>> {
     let (max_sample, mut step) = match qualityMode {
-        Quality::LOW => (18383, length / depth / 18383 * depth),
-        Quality::HIGH => (18383, length / depth / 18383 * depth),
+        Quality::LOW => (18_383, length / depth / 18_383 * depth),
+        Quality::HIGH => (18_383, length / depth / 18_383 * depth),
         Quality::AUTO | Quality::HIGHCOLOR | Quality::FULL => {
-            (4003079, length / depth / 4003079 * depth)
+            (4_003_079, length / depth / 4_003_079 * depth)
         }
     };
 
@@ -818,11 +816,7 @@ pub fn lookup_mono_darkbg(
     for n in 0..depth {
         distant += pixel[n as usize] as i32;
     }
-    if distant >= 128 * reqcolor {
-        1
-    } else {
-        0
-    }
+    i32::from(distant >= 128 * reqcolor)
 }
 
 pub fn lookup_mono_lightbg(
@@ -837,11 +831,7 @@ pub fn lookup_mono_lightbg(
     for n in 0..depth {
         distant += pixel[n as usize] as i32;
     }
-    if distant < 128 * reqcolor {
-        1
-    } else {
-        0
-    }
+    i32::from(distant < 128 * reqcolor)
 }
 
 /* choose colors using median-cut method */

@@ -286,6 +286,7 @@ impl sixel_dither {
         quality_mode: Quality,
     ) -> SixelResult<()> {
         self.set_pixelformat(pixelformat);
+        #[expect(clippy::single_match_else, reason = "could be extended")]
         let input_pixels = match pixelformat {
             PixelFormat::RGB888 => data.to_vec(),
             _ => {

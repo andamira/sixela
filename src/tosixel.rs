@@ -1,4 +1,3 @@
-#![allow(clippy::erasing_op)]
 use std::io::Write;
 
 use crate::{
@@ -61,11 +60,11 @@ impl<W: Write> sixel_output<W> {
     }
 
     pub(crate) fn puti(&mut self, i: i32) {
-        self.puts(format!("{}", i).as_str())
+        self.puts(format!("{}", i).as_str());
     }
 
     pub(crate) fn putb(&mut self, b: u8) {
-        self.puts(format!("{}", b).as_str())
+        self.puts(format!("{}", b).as_str());
     }
 
     pub fn put_flash(&mut self) -> SixelResult<()> {
