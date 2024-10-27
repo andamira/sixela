@@ -5,10 +5,9 @@ use devela::{Box, Vec, Write as IoWrite};
 
 use crate::{
     dither::DitherConf,
-    output::{sixel_node, sixel_output},
+    output::{SixelNode, SixelOutput},
     pixelformat::sixel_helper_normalize_pixelformat,
-    EncodePolicy, PaletteType, PixelFormat, SixelError, SixelResult, SIXEL_OUTPUT_PACKET_SIZE,
-    SIXEL_PALETTE_MAX,
+    EncodePolicy, PaletteType, PixelFormat, SixelError, SixelResult, SIXEL_PALETTE_MAX,
 };
 
 mod dither_fns;
@@ -29,13 +28,18 @@ const PALETTE_CHANGE: i32 = 2;
 //     CHANGE,
 // }
 
-impl<W: IoWrite> sixel_output<W> {
+impl<W: IoWrite> SixelOutput<W> {
     /* GNU Screen penetration */
+
+    // Writes a segmented data packet to the output,
+    // wrapped with DCS (Device Control String) start and end sequences.
+    //
+    // Segments data according to `SCREEN_PACKET_SIZE`, splitting if necessary.
     fn penetrate(
         &mut self,
-        nwrite: usize,   /* output size */
-        dcs_start: &str, /* DCS introducer */
-        dcs_end: &str,   /* DCS terminator */
+        nwrite: usize,   // output size
+        dcs_start: &str, // DCS introducer
+        dcs_end: &str,   // DCS terminato
     ) {
         let splitsize = SCREEN_PACKET_SIZE - dcs_start.len() - dcs_end.len();
         let mut pos = 0;
@@ -47,42 +51,47 @@ impl<W: IoWrite> sixel_output<W> {
         }
     }
 
+    // Manages buffer overflow by writing buffered data in packets of `PACKET_SIZE`.
+    //
+    // Uses `penetrate` if multiplexing is enabled; otherwise, writes directly to output.
     fn advance(&mut self) {
-        if self.buffer.len() >= SIXEL_OUTPUT_PACKET_SIZE {
+        if self.buffer.len() >= SixelOutput::<W>::PACKET_SIZE {
             if self.penetrate_multiplexer {
-                self.penetrate(SIXEL_OUTPUT_PACKET_SIZE, DCS_START_7BIT, DCS_END_7BIT);
+                self.penetrate(SixelOutput::<W>::PACKET_SIZE, DCS_START_7BIT, DCS_END_7BIT);
             } else {
-                let _ = self.fn_write.write(self.buffer[..SIXEL_OUTPUT_PACKET_SIZE].as_bytes());
+                let _ =
+                    self.fn_write.write(self.buffer[..SixelOutput::<W>::PACKET_SIZE].as_bytes());
             }
-            self.buffer.drain(0..SIXEL_OUTPUT_PACKET_SIZE);
+            self.buffer.drain(0..SixelOutput::<W>::PACKET_SIZE);
         }
     }
 
-    /// Puts a char.
+    /// Writes a single character to the output.
     #[inline]
     pub fn putc(&mut self, value: char) {
         self.buffer.push(value);
     }
 
-    /// Puts a string slice.
+    /// Writes a string to the output.
     #[inline]
     pub fn puts(&mut self, value: &str) {
         self.buffer.push_str(value);
     }
 
-    /// Puts an int.
+    /// Writes an integer value to the output as a string.
     #[inline]
     pub(crate) fn puti(&mut self, i: i32) {
         self.puts(format!("{}", i).as_str());
     }
 
-    /// Puts a byte.
+    /// Writes a byte value to the output as a string.
     #[inline]
     #[expect(dead_code)]
     pub(crate) fn putb(&mut self, b: u8) {
         self.puts(format!("{}", b).as_str());
     }
 
+    /// Adds a "flash" signal in the output stream.
     pub fn put_flash(&mut self) -> SixelResult<()> {
         if self.has_gri_arg_limit {
             /* VT240 Max 255 ? */
@@ -114,6 +123,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Outputs a single pixel to the sixel stream.
     pub fn put_pixel(&mut self, mut pix: u8) -> SixelResult<()> {
         if pix > b'?' {
             pix = b'\0';
@@ -129,11 +139,12 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Writes a sixel node to the output, with additional parameters for color and position.
     pub fn put_node(
-        &mut self,      /* output context */
-        x: &mut i32,    /* header position */
-        np: sixel_node, /* node object */
-        ncolors: i32,   /* number of palette colors */
+        &mut self,     /* output context */
+        x: &mut i32,   /* header position */
+        np: SixelNode, /* node object */
+        ncolors: i32,  /* number of palette colors */
         keycolor: i32,
     ) -> SixelResult<()> {
         if ncolors != 2 || keycolor == -1 {
@@ -163,6 +174,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Encodes and outputs the sixel image header with the specified width and height.
     pub fn encode_header(&mut self, width: i32, height: i32) -> SixelResult<()> {
         let p = [0, 0, 0];
         let mut pcount = 3;
@@ -223,6 +235,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Outputs an RGB color palette definition.
     pub fn output_rgb_palette_definition(
         &mut self,
         palette: &[u8],
@@ -251,6 +264,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Outputs an HLS color palette definition.
     pub fn output_hls_palette_definition(
         &mut self,
         palette: &[u8],
@@ -309,7 +323,8 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
-    #[allow(clippy::too_many_arguments)]
+    /// Encodes the sixel image body, including pixel and color data.
+    #[expect(clippy::too_many_arguments)]
     pub fn encode_body(
         &mut self,
         pixels: &[u8],
@@ -425,7 +440,7 @@ impl<W: IoWrite> sixel_output<W> {
                         mx = mx + n - 1;
                         mx += 1;
                     }
-                    let np = sixel_node {
+                    let np = SixelNode {
                         pal: c as i32,
                         sx,
                         mx,
@@ -500,6 +515,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Encodes and outputs the sixel image footer.
     pub fn encode_footer(&mut self) -> SixelResult<()> {
         if !self.skip_dcs_envelope && !self.penetrate_multiplexer {
             if self.has_8bit_control {
@@ -523,6 +539,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Encodes a sixel dithered image with specified pixels and configuration.
     pub fn encode_dither(
         &mut self,
         pixels: &[u8],
@@ -572,6 +589,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Encodes a high-color sixel image.
     pub fn encode_highcolor(
         &mut self,
         pixels: &mut [u8],
@@ -760,6 +778,7 @@ impl<W: IoWrite> sixel_output<W> {
         Ok(())
     }
 
+    /// Encodes a sixel image with dither and color depth settings.
     pub fn encode(
         &mut self,
         pixels: &mut [u8],

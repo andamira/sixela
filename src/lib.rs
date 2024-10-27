@@ -61,11 +61,10 @@ compile_error!("You can't enable `safe` and `unsafe*` features at the same time.
 mod dither;
 mod error;
 mod other;
-mod tosixel;
-
-pub mod output;
+mod output;
 pub mod pixelformat;
 pub mod quant;
+mod tosixel;
 
 /// All items are flat re-exported here. <br/><hr>
 pub mod all {
@@ -76,12 +75,10 @@ pub mod all {
 pub use all::*;
 #[doc(inline)]
 pub use {
-    sixel_string, DitherConf, DitherMode, MethodForLargest, MethodForRep, PixelFormat, Quality,
-    SixelDiffusion,
+    sixel_string, DitherConf, DitherMode, EncodePolicy, MethodForLargest, MethodForRep,
+    PixelFormat, Quality, SixelDiffusion, SixelNode, SixelOutput,
 };
 
-// limitations
-const SIXEL_OUTPUT_PACKET_SIZE: usize = 16_384;
 // const SIXEL_PALETTE_MIN: usize = 2;
 const SIXEL_PALETTE_MAX: usize = 256;
 // const SIXEL_USE_DEPRECATED_SYMBOLS: usize = 1;

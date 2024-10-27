@@ -1,6 +1,6 @@
 // sixela::other
 
-use crate::all::{sixel_output, DitherConf, SixelResult};
+use crate::all::{DitherConf, SixelOutput, SixelResult};
 use devela::{String, ToString, Vec};
 
 /// Writes a string of sixel data.
@@ -35,8 +35,8 @@ pub fn sixel_string(
     // IMPROVE:CHECK: we should make sure we receive positive values.
     let mut sixel_data: Vec<u8> = Vec::new(); // MAYBE with_capacity?
 
-    let mut sixel_output = sixel_output::new(&mut sixel_data);
-    sixel_output.set_encode_policy(EncodePolicy::Auto);
+    let mut SixelOutput = SixelOutput::new(&mut sixel_data);
+    SixelOutput.set_encode_policy(EncodePolicy::Auto);
     let mut dither_conf = DitherConf::new(256).unwrap();
 
     dither_conf.set_optimize_palette(true);
@@ -54,7 +54,7 @@ pub fn sixel_string(
     dither_conf.set_diffusion_method(method_for_diffuse);
 
     let mut bytes = bytes.to_vec();
-    sixel_output.encode(&mut bytes, width, height, 0, &mut dither_conf)?;
+    SixelOutput.encode(&mut bytes, width, height, 0, &mut dither_conf)?;
 
     Ok(String::from_utf8_lossy(&sixel_data).to_string())
 }
@@ -63,7 +63,7 @@ pub fn sixel_string(
 /// and sorting by that component.
 ///
 /// # Adaptation
-/// - Derived from `methodForLargest` in the `libsixel` C library.
+/// - Derived from `methodForLargest` enum in the `libsixel` C library.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub enum MethodForLargest {
@@ -79,7 +79,7 @@ pub enum MethodForLargest {
 /// Method for choosing a color from the box.
 ///
 /// # Adaptation
-/// - Derived from `methodForRep` in the `libsixel` C library.
+/// - Derived from `methodForRep` enum in the `libsixel` C library.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub enum MethodForRep {
@@ -98,7 +98,7 @@ pub enum MethodForRep {
 /// Method of diffusion.
 ///
 /// # Adaptation
-/// - Derived from `methodForDiffuse` in the `libsixel` C library.
+/// - Derived from `methodForDiffuse` enum in the `libsixel` C library.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub enum SixelDiffusion {
