@@ -3,7 +3,8 @@
 use crate::{EncodePolicy, PaletteType};
 use devela::{sys::Write as IoWrite, String, Vec};
 
-#[derive(Default, PartialEq)]
+///
+#[derive(Debug, Default, PartialEq, Eq, Hash)]
 pub struct sixel_node {
     pub pal: i32,
     pub sx: i32,
@@ -11,6 +12,8 @@ pub struct sixel_node {
     pub map: Vec<u8>,
 }
 
+///
+#[derive(Debug, Default, PartialEq, Eq, Hash)]
 pub struct sixel_output<W: IoWrite> {
     /* compatiblity flags */
 

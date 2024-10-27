@@ -23,7 +23,8 @@ const SCREEN_PACKET_SIZE: usize = 256;
 
 const PALETTE_HIT: i32 = 1;
 const PALETTE_CHANGE: i32 = 2;
-// enum Palette { // TODO
+
+// enum Palette { // TODO:MAYBE
 //     HIT,
 //     CHANGE,
 // }
@@ -57,18 +58,27 @@ impl<W: IoWrite> sixel_output<W> {
         }
     }
 
+    /// Puts a char.
+    #[inline]
     pub fn putc(&mut self, value: char) {
         self.buffer.push(value);
     }
 
+    /// Puts a string slice.
+    #[inline]
     pub fn puts(&mut self, value: &str) {
         self.buffer.push_str(value);
     }
 
+    /// Puts an int.
+    #[inline]
     pub(crate) fn puti(&mut self, i: i32) {
         self.puts(format!("{}", i).as_str());
     }
 
+    /// Puts a byte.
+    #[inline]
+    #[expect(dead_code)]
     pub(crate) fn putb(&mut self, b: u8) {
         self.puts(format!("{}", b).as_str());
     }

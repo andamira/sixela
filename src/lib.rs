@@ -43,7 +43,6 @@
     non_camel_case_types,
     non_upper_case_globals,
     clippy::upper_case_acronyms,
-    dead_code,
 )]
 //
 // nightly, safety, environment
@@ -75,15 +74,20 @@ pub mod all {
 }
 #[doc(hidden)]
 pub use all::*;
+#[doc(inline)]
+pub use {
+    sixel_string, DitherConf, DitherMode, MethodForLargest, MethodForRep, PixelFormat, Quality,
+    SixelDiffusion,
+};
 
 // limitations
 const SIXEL_OUTPUT_PACKET_SIZE: usize = 16_384;
-const SIXEL_PALETTE_MIN: usize = 2;
+// const SIXEL_PALETTE_MIN: usize = 2;
 const SIXEL_PALETTE_MAX: usize = 256;
-const SIXEL_USE_DEPRECATED_SYMBOLS: usize = 1;
-const SIXEL_ALLOCATE_BYTES_MAX: usize = 10_248 * 1_024 * 128; /* up to 128M */
-const SIXEL_WIDTH_LIMIT: usize = 1_000_000;
-const SIXEL_HEIGHT_LIMIT: usize = 1_000_000;
+// const SIXEL_USE_DEPRECATED_SYMBOLS: usize = 1;
+// const SIXEL_ALLOCATE_BYTES_MAX: usize = 10_248 * 1_024 * 128; /* up to 128M */
+// const SIXEL_WIDTH_LIMIT: usize = 1_000_000;
+// const SIXEL_HEIGHT_LIMIT: usize = 1_000_000;
 
 // loader settings
-const SIXEL_DEFALUT_GIF_DELAY: usize = 1;
+// const SIXEL_DEFALUT_GIF_DELAY: usize = 1;
