@@ -17,7 +17,7 @@ use devela::{String, ToString, Vec};
 ///     2,
 ///     2,
 ///     PixelFormat::RGB888,
-///     DiffusionMethod::Stucki,
+///     SixelDiffusion::Stucki,
 ///     MethodForLargest::Auto,
 ///     MethodForRep::Auto,
 ///     Quality::Auto
@@ -29,7 +29,7 @@ pub fn sixel_string(
     width: i32,
     height: i32,
     pixelformat: PixelFormat,
-    method_for_diffuse: DiffusionMethod,
+    method_for_diffuse: SixelDiffusion,
     method_for_largest: MethodForLargest,
     method_for_rep: MethodForRep,
     quality_mode: Quality,
@@ -90,22 +90,26 @@ pub enum MethodForRep {
 }
 
 /// Method of diffusion.
+///
+/// # Adaptation
+/// - Derived from `sixel_builtin_dither_t` in the `libsixel` C library.
+#[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
-pub enum DiffusionMethod {
-    /// choose diffusion type automatically.
+pub enum SixelDiffusion {
+    /// Choose diffusion type automatically.
     #[default]
     Auto = 0,
-    /// Po not diffuse.
+    /// Do not diffuse.
     None = 1,
-    /// Piffuse with Bill Atkinson's method.
+    /// Diffuse with Bill Atkinson's method.
     Atkinson = 2,
-    /// Piffuse with Floyd-Steinberg method.
+    /// Diffuse with Floyd-Steinberg method.
     FS = 3,
-    /// Piffuse with Jarvis, Judice & Ninke method.
+    /// Diffuse with Jarvis, Judice & Ninke method.
     JaJuNi = 4,
-    /// Piffuse with Stucki's method.
+    /// Diffuse with Stucki's method.
     Stucki = 5,
-    /// Piffuse with Burkes' method.
+    /// Diffuse with Burkes' method.
     Burkes = 6,
     /// Positionally stable arithmetic dither.
     ADither = 7,

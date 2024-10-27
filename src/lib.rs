@@ -59,11 +59,11 @@ compile_error!("You can't enable the `std` and `no_std` features at the same tim
 #[cfg(all(feature = "safe", feature = "unsafe"))]
 compile_error!("You can't enable `safe` and `unsafe*` features at the same time.");
 
+mod dither;
 mod error;
 mod other;
 mod tosixel;
 
-pub mod dither;
 pub mod output;
 pub mod pixelformat;
 pub mod quant;
