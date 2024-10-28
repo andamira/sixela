@@ -172,6 +172,7 @@ impl DitherConf {
         };
     }
 
+    /// TODO
     #[allow(clippy::too_many_arguments)]
     pub fn initialize(
         &mut self,

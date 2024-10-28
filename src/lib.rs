@@ -58,22 +58,19 @@ mod dither;
 mod error;
 mod other;
 mod output;
-pub mod pixelformat;
-pub mod quant;
 mod tosixel;
+// no public items:
+mod pixelformat;
+mod quant;
 
 /// All items are flat re-exported here. <br/><hr>
+#[doc(hidden)]
 pub mod all {
     #[doc(inline)]
-    pub use super::{dither::*, error::*, other::*, output::*, pixelformat::*, quant::*};
+    pub use super::{dither::*, error::*, other::*, output::*};
 }
-#[doc(hidden)]
-pub use all::*;
 #[doc(inline)]
-pub use {
-    sixel_string, DitherConf, DitherMode, EncodePolicy, MethodForLargest, MethodForRep,
-    PixelFormat, Quality, SixelDiffusion, SixelNode, SixelOutput,
-};
+pub use all::*;
 
 // const SIXEL_PALETTE_MIN: usize = 2;
 const SIXEL_PALETTE_MAX: usize = 256;

@@ -9,7 +9,7 @@ use crate::{
 use alloc::vec;
 use devela::{AllocMap as HashMap, Box, Ordering, Vec};
 
-// TODO
+/// TODO
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 struct BBox {
     pub ind: i32,
@@ -17,7 +17,7 @@ struct BBox {
     pub sum: i32,
 }
 impl BBox {
-    // Comparing function to be used for ordering
+    /// Comparing function to be used for ordering
     const fn sum_cmp(b1: &BBox, b2: &BBox) -> Ordering {
         if b2.sum > b1.sum {
             Ordering::Greater
@@ -45,7 +45,7 @@ fn new_color_map(newcolors: i32, depth: i32) -> HashMap<i32, Tuple> {
     colormap
 }
 
-// TODO
+/// TODO
 #[must_use]
 fn new_box_vector(colors: i32, sum: i32, newcolors: i32) -> Vec<BBox> {
     let mut result = vec![BBox { ind: 0, colors: 0, sum: 0 }; newcolors as usize];
@@ -58,7 +58,8 @@ fn new_box_vector(colors: i32, sum: i32, newcolors: i32) -> Vec<BBox> {
     result
 }
 
-/// TODO
+/// Go through the box finding the minimum and maximum of each
+/// component - the boundaries of the box.
 fn find_box_boundaries(
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
@@ -67,11 +68,6 @@ fn find_box_boundaries(
     minval: &mut [i32],
     maxval: &mut [i32],
 ) {
-    /*----------------------------------------------------------------------------
-      Go through the box finding the minimum and maximum of each
-      component - the boundaries of the box.
-    -----------------------------------------------------------------------------*/
-
     for plane in 0..depth {
         minval[plane as usize] = colorfreqtable.get(&(boxStart)).unwrap().tuple[plane as usize];
         maxval[plane as usize] = minval[plane as usize];
@@ -100,14 +96,11 @@ fn largest_by_norm(minval: &[i32], maxval: &[i32], depth: i32) -> i32 {
     largestDimension as i32
 }
 
-/*----------------------------------------------------------------------------
-   This function presumes that the tuple type is either
-   BLACKANDWHITE, GRAYSCALE, or RGB (which implies pamP->depth is 1 or 3).
-   To save time, we don't actually check it.
------------------------------------------------------------------------------*/
-/// TODO:
+/// This function presumes that the tuple type is either
+/// BLACKANDWHITE, GRAYSCALE, or RGB (which implies pamP->depth is 1 or 3).
+/// To save time, we don't actually check it.
 #[must_use]
-pub fn largest_by_luminosity(minval: &[i32], maxval: &[i32], depth: i32) -> i32 {
+fn largest_by_luminosity(minval: &[i32], maxval: &[i32], depth: i32) -> i32 {
     let retval;
     let lumin_factor = [0.2989, 0.5866, 0.1145];
 
@@ -130,7 +123,7 @@ pub fn largest_by_luminosity(minval: &[i32], maxval: &[i32], depth: i32) -> i32 
     retval as i32
 }
 
-// TODO
+/// TODO
 fn center_box(
     boxStart: i32,
     boxSize: i32,
@@ -170,7 +163,8 @@ fn average_colors(
     }
 }
 
-// TODO
+/// Number of tuples represented by the box
+/// Count the tuples in question
 fn average_pixels(
     boxStart: i32,
     boxSize: i32,
@@ -178,8 +172,6 @@ fn average_pixels(
     depth: i32,
     newTuple: &mut [i32],
 ) {
-    /* Number of tuples represented by the box */
-    /* Count the tuples in question */
     let mut n = 0; /* initial value */
     for i in 0..boxSize {
         n += colorfreqtable.get(&(boxStart + i)).unwrap().value;
@@ -195,7 +187,13 @@ fn average_pixels(
     }
 }
 
-// TODO
+///
+/// Ok, we've got enough boxes.  Now choose a representative color for
+/// each box.  There are a number of possible ways to make this choice.
+/// One would be to choose the center of the box; this ignores any structure
+/// within the boxes.  Another method would be to average all the colors in
+/// the box - this is the method specified in Heckbert's paper.  A third
+/// method is to average all the pixels in the box.
 fn color_map_from_bv(
     newcolors: i32,
     bv: &[BBox],
@@ -204,14 +202,6 @@ fn color_map_from_bv(
     depth: i32,
     methodForRep: MethodForRep,
 ) -> HashMap<i32, Tuple> {
-    /*
-     ** Ok, we've got enough boxes.  Now choose a representative color for
-     ** each box.  There are a number of possible ways to make this choice.
-     ** One would be to choose the center of the box; this ignores any structure
-     ** within the boxes.  Another method would be to average all the colors in
-     ** the box - this is the method specified in Heckbert's paper.  A third
-     ** method is to average all the pixels in the box.
-     */
     let mut colormap = new_color_map(newcolors, depth);
 
     for bi in 0..boxes {
@@ -248,15 +238,13 @@ fn color_map_from_bv(
     colormap
 }
 
-/*----------------------------------------------------------------------------
-   Split Box 'bi' in the box vector bv (so that bv contains one more box
-   than it did as input).  Split it so that each new box represents about
-   half of the pixels in the distribution given by 'colorfreqtable' for
-   the colors in the original box, but with distinct colors in each of the
-   two new boxes.
-
-   Assume the box contains at least two colors.
------------------------------------------------------------------------------*/
+/// Split Box 'bi' in the box vector bv (so that bv contains one more box
+/// than it did as input).  Split it so that each new box represents about
+/// half of the pixels in the distribution given by 'colorfreqtable' for
+/// the colors in the original box, but with distinct colors in each of the
+/// two new boxes.
+///
+/// Assume the box contains at least two colors.
 fn split_box(
     bv: &mut [BBox],
     boxesP: &mut i32,
@@ -325,14 +313,13 @@ fn split_box(
     Ok(())
 }
 
-/* Compute a set of only 'newcolors' colors that best represent an
-   image whose pixels are summarized by the histogram
-   'colorfreqtable'.  Each tuple in that table has depth 'depth'.
-   colorfreqtable.table[i] tells the number of pixels in the subject image
-   have a particular color.
-
-   As a side effect, sort 'colorfreqtable'.
-*/
+/// Compute a set of only 'newcolors' colors that best represent an
+/// image whose pixels are summarized by the histogram
+/// 'colorfreqtable'.  Each tuple in that table has depth 'depth'.
+/// colorfreqtable.table\[i\] tells the number of pixels in the subject image
+/// have a particular color.
+///
+/// As a side effect, sort 'colorfreqtable'.
 fn mediancut(
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
@@ -347,15 +334,15 @@ fn mediancut(
         sum += colorfreqtable.get(&(i as i32)).unwrap().value;
     }
 
-    /* There is at least one box that contains at least 2 colors; ergo,
-    there is more splitting we can do.  */
+    // There is at least one box that contains at least 2 colors; ergo,
+    // there is more splitting we can do.
     let mut bv = new_box_vector(colorfreqtable.len() as i32, sum, newcolors);
     let mut boxes = 1;
     let mut multicolorBoxesExist = colorfreqtable.len() > 1;
 
-    /* Main loop: split boxes until we have enough. */
+    // Main loop: split boxes until we have enough.
     while boxes < newcolors && multicolorBoxesExist {
-        /* Find the first splittable box. */
+        // Find the first splittable box.
         let mut bi = 0;
         while bi < boxes && bv[bi as usize].colors < 2 {
             bi += 1;
@@ -372,7 +359,7 @@ fn mediancut(
     Ok(())
 }
 
-// TODO
+/// TODO
 fn compute_hash(data: &[u8], i: usize, depth: i32) -> i32 {
     let mut hash = 0;
     for n in 0..depth {
@@ -381,14 +368,14 @@ fn compute_hash(data: &[u8], i: usize, depth: i32) -> i32 {
     hash
 }
 
-// TODO
+/// TODO
 #[derive(Clone)]
 struct Tuple {
     pub value: i32,
     pub tuple: Vec<i32>,
 }
 
-// TODO
+/// TODO
 fn compute_histogram(
     data: &[u8],
     length: i32,
@@ -446,25 +433,23 @@ fn compute_histogram(
     Ok(colorfreqtable)
 }
 
-/*
-    Produce a colormap containing the best colors to represent the
-    image stream in file 'ifP'.  Figure it out using the median cut
-    technique.
-
-    The colormap will have 'reqcolors' or fewer colors in it, unless
-    'allcolors' is true, in which case it will have all the colors that
-    are in the input.
-
-    The colormap has the same maxval as the input.
-
-    Put the colormap in newly allocated storage as a tupletable2
-    and return its address as *colormapP.  Return the number of colors in
-    it as *colorsP and its maxval as *colormapMaxvalP.
-
-    Return the characteristics of the input file as
-    *formatP and *freqPamP.  (This information is not really
-    relevant to our colormap mission; just a fringe benefit).
-*/
+/// Produce a colormap containing the best colors to represent the
+/// image stream in file 'ifP'.  Figure it out using the median cut
+/// technique.
+///
+/// The colormap will have 'reqcolors' or fewer colors in it, unless
+/// 'allcolors' is true, in which case it will have all the colors that
+/// are in the input.
+///
+/// The colormap has the same maxval as the input.
+///
+/// Put the colormap in newly allocated storage as a tupletable2
+/// and return its address as *colormapP.  Return the number of colors in
+/// it as *colorsP and its maxval as *colormapMaxvalP.
+///
+/// Return the characteristics of the input file as
+/// *formatP and *freqPamP.  (This information is not really
+/// relevant to our colormap mission; just a fringe benefit).
 #[expect(clippy::too_many_arguments)]
 fn compute_color_map_from_input(
     data: &[u8],
@@ -507,7 +492,7 @@ fn compute_color_map_from_input(
 }
 
 /// Diffuses error energy to surround pixels.
-pub fn error_diffuse(
+fn error_diffuse(
     data: &mut [u8],  /* base address of pixel buffer */
     pos: i32,         /* address of the destination pixel */
     depth: i32,       /* color depth in bytes */
@@ -527,14 +512,14 @@ pub fn error_diffuse(
     data[offset] = c as u8;
 }
 
-// No diffusion.
+/// No diffusion.
 #[inline] #[rustfmt::skip]
 fn diffuse_none(_: &mut [u8], _: i32, _h: i32, _x: i32, _y: i32, _: i32, _: i32) {}
 
-/* Floyd Steinberg Method
- *          curr    7/16
- *  3/16    5/48    1/16
- */
+/// Floyd Steinberg Method
+///          curr    7/16
+///  3/16    5/48    1/16
+///
 fn diffuse_fs(data: &mut [u8], width: i32, height: i32, x: i32, y: i32, depth: i32, error: i32) {
     let pos = y * width + x;
     if x < width - 1 && y < height - 1 {
@@ -549,11 +534,11 @@ fn diffuse_fs(data: &mut [u8], width: i32, height: i32, x: i32, y: i32, depth: i
     }
 }
 
-/* Atkinson's Method
- *          curr    1/8    1/8
- *   1/8     1/8    1/8
- *           1/8
- */
+/// Atkinson's Method
+///          curr    1/8    1/8
+///   1/8     1/8    1/8
+///           1/8
+///
 fn diffuse_atkinson(
     data: &mut [u8],
     width: i32,
@@ -580,11 +565,11 @@ fn diffuse_atkinson(
     }
 }
 
-/* Jarvis, Judice & Ninke Method
- *                  curr    7/48    5/48
- *  3/48    5/48    7/48    5/48    3/48
- *  1/48    3/48    5/48    3/48    1/48
-*/
+/// Jarvis, Judice & Ninke Method
+///                  curr    7/48    5/48
+///  3/48    5/48    7/48    5/48    3/48
+///  1/48    3/48    5/48    3/48    1/48
+///
 fn diffuse_jajuni(
     data: &mut [u8],
     width: i32,
@@ -611,11 +596,11 @@ fn diffuse_jajuni(
     }
 }
 
-/* Stucki's Method
- *                  curr    8/48    4/48
- *  2/48    4/48    8/48    4/48    2/48
- *  1/48    2/48    4/48    2/48    1/48
- */
+/// Stucki's Method
+///                  curr    8/48    4/48
+///  2/48    4/48    8/48    4/48    2/48
+///  1/48    2/48    4/48    2/48    1/48
+///
 fn diffuse_stucki(
     data: &mut [u8],
     width: i32,
@@ -642,10 +627,10 @@ fn diffuse_stucki(
     }
 }
 
-/* Burkes' Method
- *                  curr    4/16    2/16
- *  1/16    2/16    4/16    2/16    1/16
- */
+/// Burkes' Method
+///                  curr    4/16    2/16
+///  1/16    2/16    4/16    2/16    1/16
+///
 fn diffuse_burkes(
     data: &mut [u8],
     width: i32,
@@ -667,21 +652,21 @@ fn diffuse_burkes(
     }
 }
 
-// TODO
+/// TODO
 #[inline]
 #[must_use]
 const fn mask_a(x: i32, y: i32, c: i32) -> f32 {
     ((((x + c * 67) + y * 236) * 119) & 255) as f32 / 128.0 - 1.0
 }
 
-// TODO
+/// TODO
 #[inline]
 #[must_use]
 const fn mask_x(x: i32, y: i32, c: i32) -> f32 {
     ((((x + c * 29) ^ (y * 149)) * 1234) & 511) as f32 / 256.0 - 1.0
 }
 
-// Lookup closest color from palette with "normal" strategy.
+/// Lookup closest color from palette with "normal" strategy.
 #[must_use]
 fn lookup_normal(
     pixel: &[u8],
@@ -713,7 +698,7 @@ fn lookup_normal(
     result
 }
 
-// lookup closest color from palette with "fast" strategy.
+/// lookup closest color from palette with "fast" strategy.
 fn lookup_fast(
     pixel: &[u8],
     _depth: i32,
@@ -760,7 +745,7 @@ fn lookup_fast(
     result
 }
 
-// TODO
+/// TODO
 fn lookup_mono_darkbg(
     pixel: &[u8],
     depth: i32,
@@ -776,7 +761,7 @@ fn lookup_mono_darkbg(
     i32::from(distant >= 128 * reqcolor)
 }
 
-// TODO
+/// TODO
 fn lookup_mono_lightbg(
     pixel: &[u8],
     depth: i32,
@@ -792,7 +777,7 @@ fn lookup_mono_lightbg(
     i32::from(distant < 128 * reqcolor)
 }
 
-// Choose colors using median-cut method.
+/// Choose colors using median-cut method.
 #[expect(clippy::too_many_arguments)]
 pub(crate) fn sixel_quant_make_palette(
     data: &[u8],
@@ -831,7 +816,7 @@ pub(crate) fn sixel_quant_make_palette(
     Ok(result)
 }
 
-// Apply color palette into specified pixel buffers
+/// Apply color palette into specified pixel buffers
 #[expect(clippy::too_many_arguments)]
 pub(crate) fn sixel_quant_apply_palette(
     result: &mut [u8],
@@ -848,13 +833,11 @@ pub(crate) fn sixel_quant_apply_palette(
     cachetable: Option<&mut [u16]>,
 ) -> SixelResult<i32> {
     let mut ncolors: i32;
-    /* check bad reqcolor */
+    // check bad reqcolor
     if reqcolor < 1 {
-        /*
-            sixel_helper_set_additional_message(
-            "sixel_quant_apply_palette: "
-            "a bad argument is detected, reqcolor < 0.");
-        */
+        // sixel_helper_set_additional_message(
+        // "sixel_quant_apply_palette: "
+        // "a bad argument is detected, reqcolor < 0.");
         return Err(Box::new(SixelError::BadArgument));
     }
 
@@ -931,7 +914,7 @@ pub(crate) fn sixel_quant_apply_palette(
                         }
                         copy.push(val.clamp(0, 255) as u8);
                     }
-                    //                   &[u8], i32, &[u8], i32, &mut [u16], i32
+                    //                    &[u8],  i32,   &[u8],    i32,    &mut [u16],    i32
                     let color_index =
                         f_lookup.unwrap()(&copy, depth, palette, reqcolor, indextable, complexion)
                             as usize;

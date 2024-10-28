@@ -3,7 +3,8 @@
 use crate::{PixelFormat, SixelError, SixelResult};
 use devela::Box;
 
-pub fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, u8) {
+/// TODO
+fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, u8) {
     let mut count = 0;
     let mut pixels: u32 = 0;
     while count < depth {
@@ -61,7 +62,8 @@ pub fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, 
     (r as u8, g as u8, b as u8)
 }
 
-pub fn sixel_helper_compute_depth(pixelformat: PixelFormat) -> i32 {
+/// TODO
+pub(crate) fn sixel_helper_compute_depth(pixelformat: PixelFormat) -> i32 {
     match pixelformat {
         PixelFormat::ARGB8888
         | PixelFormat::RGBA8888
@@ -88,7 +90,8 @@ pub fn sixel_helper_compute_depth(pixelformat: PixelFormat) -> i32 {
     }
 }
 
-pub fn expand_rgb(
+/// TODO
+fn expand_rgb(
     dst: &mut [u8],
     src: &[u8],
     width: i32,
@@ -109,7 +112,8 @@ pub fn expand_rgb(
     }
 }
 
-pub fn expand_palette(
+/// TODO
+fn expand_palette(
     dst: &mut [u8],
     src: &[u8],
     width: i32,
@@ -158,7 +162,7 @@ pub fn expand_palette(
 }
 
 /// returns dst_pixelformat: PixelFormat,
-pub fn sixel_helper_normalize_pixelformat(
+pub(crate) fn sixel_helper_normalize_pixelformat(
     dst: &mut [u8],
     src: &[u8],
     src_pixelformat: PixelFormat,

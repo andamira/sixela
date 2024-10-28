@@ -44,7 +44,7 @@ pub enum SixelError {
     NotImplemented,
 }
 
-mod core_impls {
+mod _core_impls {
     use super::{Error, SixelError};
     use core::fmt;
 
