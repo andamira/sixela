@@ -1,5 +1,4 @@
 [build]
-# https://github.com/rust-lang/cargo/issues/331#issuecomment-1081704033
 rustdocflags = ["--html-in-header", "./DOCS/rustdoc-header.html"]
 
 
@@ -88,24 +87,14 @@ Crp = "clean --release --package"
 # DOC
 d = "doc --no-deps"
 do = "doc --no-deps --open"
+dp = "doc --no-deps --document-private-items"
+dpo = "doc --no-deps --open --document-private-items"
 # +nightly
 nd = "doc --no-deps -F=nightly_doc"
-ndd = "doc --no-deps -F=nightly_doc,dep"
-ndf = "doc --no-deps -F=nightly_doc,all"
-nds = "doc --no-deps -F=nightly_doc,std"
-ndfd = "doc --no-deps -F=nightly_doc,all,dep"
-ndsd = "doc --no-deps -F=nightly_doc,std,dep"
-ndsf = "doc --no-deps -F=nightly_doc,std,all"
-ndsfd = "doc --no-deps -F=nightly_doc,std,all,dep"
+ndp = "doc --no-deps -F=nightly_doc --document-private-items"
 #
 ndo = "doc --open --no-deps -F=nightly_doc"
-nddo = "doc --open --no-deps -F=nightly_doc,dep"
-ndfo = "doc --open --no-deps -F=nightly_doc,all"
-ndso = "doc --open --no-deps -F=nightly_doc,std"
-ndfdo = "doc --open --no-deps -F=nightly_doc,all,dep"
-ndsdo = "doc --open --no-deps -F=nightly_doc,std,dep"
-ndsfo = "doc --open --no-deps -F=nightly_doc,std,all"
-ndsfdo = "doc --open --no-deps -F=nightly_doc,std,all,dep"
+ndpo = "doc --open --no-deps -F=nightly_doc --document-private-items"
 
 # TREE
 tr = "tree"
@@ -129,58 +118,6 @@ Al = "asm --simplify -p devela --lib"
 Aub = "asm --simplify -p devela --features=unsafe,std --bin"
 Aue = "asm --simplify -p devela --features=unsafe,std --example"
 Aul = "asm --simplify -p devela --features=unsafe,std --lib"
-
-# additional targets
-# 1: x86_64-unknown-linux-gnu (std)
-AbT1 = "asm --simplify -p devela --target x86_64-unknown-linux-gnu --features=std,safe --bin"
-AubT1 = "asm --simplify -p devela --target x86_64-unknown-linux-gnu --features=std,unsafe --bin"
-AeT1 = "asm --simplify -p devela --target x86_64-unknown-linux-gnu --features=std,safe --example"
-AueT1 = "asm --simplify -p devela --target x86_64-unknown-linux-gnu --features=std,unsafe --example"
-AlT1 = "asm --simplify -p devela --target x86_64-unknown-linux-gnu --features=std,safe --lib"
-AulT1 = "asm --simplify -p devela --target x86_64-unknown-linux-gnu --features=std,unsafe --lib"
-# 2: x86_64-pc-windows-msvc (std)
-AbT2 = "asm --simplify -p devela --target x86_64-pc-windows-msvc --features=std,safe --bin"
-AubT2 = "asm --simplify -p devela --target x86_64-pc-windows-msvc --features=std,unsafe --bin"
-AeT2 = "asm --simplify -p devela --target x86_64-pc-windows-msvc --features=std,safe --example"
-AueT2 = "asm --simplify -p devela --target x86_64-pc-windows-msvc --features=std,unsafe --example"
-AlT2 = "asm --simplify -p devela --target x86_64-pc-windows-msvc --features=std,safe --lib"
-AulT2 = "asm --simplify -p devela --target x86_64-pc-windows-msvc --features=std,unsafe --lib"
-# 3: x86_64-apple-darwin (std)
-AbT3 = "asm --simplify -p devela --target x86_64-apple-darwin --features=std,safe --bin"
-AubT3 = "asm --simplify -p devela --target x86_64-apple-darwin --features=std,unsafe --bin"
-AeT3 = "asm --simplify -p devela --target x86_64-apple-darwin --features=std,safe --example"
-AueT3 = "asm --simplify -p devela --target x86_64-apple-darwin --features=std,unsafe --example"
-AlT3 = "asm --simplify -p devela --target x86_64-apple-darwin --features=std,safe --lib"
-AulT3 = "asm --simplify -p devela --target x86_64-apple-darwin --features=std,unsafe --lib"
-# 4: i686-unknown-linu-gnu (std)
-AbT4 = "asm --simplify -p devela --target i686-unknown-linux-gnu --features=std,safe --bin"
-AubT4 = "asm --simplify -p devela --target i686-unknown-linux-gnu --features=std,unsafe --bin"
-AeT4 = "asm --simplify -p devela --target i686-unknown-linux-gnu --features=std,safe --example"
-AueT4 = "asm --simplify -p devela --target i686-unknown-linux-gnu --features=std,unsafe --example"
-AlT4 = "asm --simplify -p devela --target i686-unknown-linux-gnu --features=std,safe --lib"
-AulT4 = "asm --simplify -p devela --target i686-unknown-linux-gnu --features=std,unsafe --lib"
-#
-# 6: x86_64 (no_std):
-AnbT6 = "asm --simplify -p devela --target x86_64-unknown-none --features=no_std,safe --bin"
-AnubT6 = "asm --simplify -p devela --target x86_64-unknown-none --features=no_std,unsafe --bin"
-AneT6 = "asm --simplify -p devela --target x86_64-unknown-none --features=no_std,safe --example"
-AnueT6 = "asm --simplify -p devela --target x86_64-unknown-none --features=no_std,unsafe --example"
-AnlT6 = "asm --simplify -p devela --target x86_64-unknown-none --features=no_std,safe --lib"
-AnulT6 = "asm --simplify -p devela --target x86_64-unknown-none --features=no_std,unsafe --lib"
-# 7: thumbv7m-none-eabi (no_std)
-AnbT7 = "asm --simplify -p devela --target aarch64-unknown-none --features=no_std,safe --bin"
-AnubT7 = "asm --simplify -p devela --target aarch64-unknown-none --features=no_std,unsafe --bin"
-AneT7 = "asm --simplify -p devela --target aarch64-unknown-none --features=no_std,safe --example"
-AnueT7 = "asm --simplify -p devela --target aarch64-unknown-none --features=no_std,unsafe --example"
-AnlT7 = "asm --simplify -p devela --target aarch64-unknown-none --features=no_std,safe --lib"
-AnulT7 = "asm --simplify -p devela --target aarch64-unknown-none --features=no_std,unsafe --lib"
-# 8: aarch64-unknown-none (no_std)
-AnbT8 = "asm --simplify -p devela --target thumbv7m-none-eabi --features=no_std,safe --bin"
-AnubT8 = "asm --simplify -p devela --target thumbv7m-none-eabi --features=no_std,unsafe --bin"
-AneT8 = "asm --simplify -p devela --target thumbv7m-none-eabi --features=no_std,safe --example"
-AnueT8 = "asm --simplify -p devela --target thumbv7m-none-eabi --features=no_std,unsafe --example"
-AnlT8 = "asm --simplify -p devela --target thumbv7m-none-eabi --features=no_std,safe --lib"
-AnulT8 = "asm --simplify -p devela --target thumbv7m-none-eabi --features=no_std,unsafe --lib"
 
 # https://crates.io/crates/cargo-supply-chain
 S = "supply-chain"
