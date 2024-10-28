@@ -86,7 +86,7 @@ impl<W: IoWrite> SixelOutput<W> {
 
     /// Writes a byte value to the output as a string.
     #[inline]
-    #[expect(dead_code)]
+    #[expect(unused, reason = "…")]
     pub(crate) fn putb(&mut self, b: u8) {
         self.puts(format!("{}", b).as_str());
     }

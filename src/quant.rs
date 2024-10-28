@@ -1,7 +1,5 @@
 // sixela::quant
 
-#![allow(non_snake_case)]
-
 use crate::{
     pixelformat::sixel_helper_compute_depth, MethodForLargest, MethodForRep, PixelFormat, Quality,
     SixelDiffusion, SixelError, SixelResult,
@@ -63,18 +61,18 @@ fn new_box_vector(colors: i32, sum: i32, newcolors: i32) -> Vec<BBox> {
 fn find_box_boundaries(
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    boxStart: i32,
-    boxSize: i32,
+    box_start: i32,
+    box_size: i32,
     minval: &mut [i32],
     maxval: &mut [i32],
 ) {
     for plane in 0..depth {
-        minval[plane as usize] = colorfreqtable.get(&(boxStart)).unwrap().tuple[plane as usize];
+        minval[plane as usize] = colorfreqtable.get(&(box_start)).unwrap().tuple[plane as usize];
         maxval[plane as usize] = minval[plane as usize];
     }
-    for i in 1..boxSize {
+    for i in 1..box_size {
         for plane in 0..depth {
-            let v = colorfreqtable.get(&(boxStart + i)).unwrap().tuple[plane as usize];
+            let v = colorfreqtable.get(&(box_start + i)).unwrap().tuple[plane as usize];
             minval[plane as usize] = minval[plane as usize].min(v);
             maxval[plane as usize] = maxval[plane as usize].max(v);
         }
@@ -83,23 +81,25 @@ fn find_box_boundaries(
 
 /// TODO
 #[must_use]
+#[expect(unused, reason = "WIP")]
 fn largest_by_norm(minval: &[i32], maxval: &[i32], depth: i32) -> i32 {
-    let mut largestSpreadSoFar = 0;
-    let mut largestDimension = 0;
+    let mut largest_spread_so_far = 0;
+    let mut largest_dimension = 0;
     for plane in 0..depth as usize {
         let spread = maxval[plane] - minval[plane];
-        if spread > largestSpreadSoFar {
-            largestDimension = plane;
-            largestSpreadSoFar = spread;
+        if spread > largest_spread_so_far {
+            largest_dimension = plane;
+            largest_spread_so_far = spread;
         }
     }
-    largestDimension as i32
+    largest_dimension as i32
 }
 
 /// This function presumes that the tuple type is either
 /// BLACKANDWHITE, GRAYSCALE, or RGB (which implies pamP->depth is 1 or 3).
 /// To save time, we don't actually check it.
 #[must_use]
+#[expect(unused, reason = "WIP")]
 fn largest_by_luminosity(minval: &[i32], maxval: &[i32], depth: i32) -> i32 {
     let retval;
     let lumin_factor = [0.2989, 0.5866, 0.1145];
@@ -108,82 +108,82 @@ fn largest_by_luminosity(minval: &[i32], maxval: &[i32], depth: i32) -> i32 {
         retval = 0;
     } else {
         /* An RGB tuple */
-        let mut largestSpreadSoFar = 0.0;
-        let mut largestDimension = 0;
+        let mut largest_spread_so_far = 0.0;
+        let mut largest_dimension = 0;
 
         for plane in 0..3 {
             let spread = lumin_factor[plane] * (maxval[plane] - minval[plane]) as f32;
-            if spread > largestSpreadSoFar {
-                largestDimension = plane;
-                largestSpreadSoFar = spread;
+            if spread > largest_spread_so_far {
+                largest_dimension = plane;
+                largest_spread_so_far = spread;
             }
         }
-        retval = largestDimension;
+        retval = largest_dimension;
     }
     retval as i32
 }
 
 /// TODO
 fn center_box(
-    boxStart: i32,
-    boxSize: i32,
+    box_start: i32,
+    box_size: i32,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    newTuple: &mut [i32],
+    new_tuple: &mut [i32],
 ) {
     for plane in 0..depth {
-        let mut maxval = colorfreqtable.get(&(boxStart)).unwrap().tuple[plane as usize];
+        let mut maxval = colorfreqtable.get(&(box_start)).unwrap().tuple[plane as usize];
         let mut minval = maxval;
 
-        for i in 1..boxSize {
-            let v = colorfreqtable.get(&(boxStart + i)).unwrap().tuple[plane as usize];
+        for i in 1..box_size {
+            let v = colorfreqtable.get(&(box_start + i)).unwrap().tuple[plane as usize];
             minval = minval.min(v);
             maxval = maxval.max(v);
         }
-        newTuple[plane as usize] = (minval + maxval) / 2;
+        new_tuple[plane as usize] = (minval + maxval) / 2;
     }
 }
 
 /// TODO
 fn average_colors(
-    boxStart: i32,
-    boxSize: i32,
+    box_start: i32,
+    box_size: i32,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    newTuple: &mut [i32],
+    new_tuple: &mut [i32],
 ) {
     for plane in 0..depth {
         let mut sum = 0;
 
-        for i in 0..boxSize {
-            sum += colorfreqtable.get(&(boxStart + i)).unwrap().tuple[plane as usize];
+        for i in 0..box_size {
+            sum += colorfreqtable.get(&(box_start + i)).unwrap().tuple[plane as usize];
         }
 
-        newTuple[plane as usize] = sum / boxSize;
+        new_tuple[plane as usize] = sum / box_size;
     }
 }
 
 /// Number of tuples represented by the box
 /// Count the tuples in question
 fn average_pixels(
-    boxStart: i32,
-    boxSize: i32,
+    box_start: i32,
+    box_size: i32,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    newTuple: &mut [i32],
+    new_tuple: &mut [i32],
 ) {
     let mut n = 0; /* initial value */
-    for i in 0..boxSize {
-        n += colorfreqtable.get(&(boxStart + i)).unwrap().value;
+    for i in 0..box_size {
+        n += colorfreqtable.get(&(box_start + i)).unwrap().value;
     }
 
     for plane in 0..depth {
         let mut sum = 0;
-        for i in 0..boxSize {
-            sum += colorfreqtable.get(&(boxStart + i)).unwrap().tuple[plane as usize]
-                * colorfreqtable.get(&(boxStart + i)).unwrap().value;
+        for i in 0..box_size {
+            sum += colorfreqtable.get(&(box_start + i)).unwrap().tuple[plane as usize]
+                * colorfreqtable.get(&(box_start + i)).unwrap().value;
         }
-        newTuple[plane as usize] = sum / n;
+        new_tuple[plane as usize] = sum / n;
     }
 }
 
@@ -200,12 +200,12 @@ fn color_map_from_bv(
     boxes: i32,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    methodForRep: MethodForRep,
+    rep: MethodForRep,
 ) -> HashMap<i32, Tuple> {
     let mut colormap = new_color_map(newcolors, depth);
 
     for bi in 0..boxes {
-        match methodForRep {
+        match rep {
             MethodForRep::CenterBox => {
                 center_box(
                     bv[bi as usize].ind,
@@ -247,14 +247,14 @@ fn color_map_from_bv(
 /// Assume the box contains at least two colors.
 fn split_box(
     bv: &mut [BBox],
-    boxesP: &mut i32,
+    boxes: &mut i32,
     bi: usize,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    methodForLargest: MethodForLargest,
+    _largest: MethodForLargest,
 ) -> SixelResult<()> {
-    let boxStart = bv[bi].ind;
-    let boxSize = bv[bi].colors;
+    let box_start = bv[bi].ind;
+    let box_size = bv[bi].colors;
     let sm = bv[bi].sum;
 
     let max_depth = 16;
@@ -263,17 +263,17 @@ fn split_box(
 
     /* assert(max_depth >= depth); */
 
-    find_box_boundaries(colorfreqtable, depth, boxStart, boxSize, &mut minval, &mut maxval);
+    find_box_boundaries(colorfreqtable, depth, box_start, box_size, &mut minval, &mut maxval);
 
     /* Find the largest dimension, and sort by that component.  I have
        included two methods for determining the "largest" dimension;
        first by simply comparing the range in RGB space, and second by
        transforming into luminosities before the comparison.
     */
-    let _largestDimension = match methodForLargest {
-        MethodForLargest::Auto | MethodForLargest::Norm => largest_by_norm(&minval, &maxval, depth),
-        MethodForLargest::Lum => largest_by_luminosity(&minval, &maxval, depth),
-    };
+    // let _largest_dimension = match _largest {
+    //     MethodForLargest::Auto | MethodForLargest::Norm => largest_by_norm(&minval, &maxval, depth),
+    //     MethodForLargest::Lum => largest_by_luminosity(&minval, &maxval, depth),
+    // };
 
     /* TODO: I think this sort should go after creating a box,
        not before splitting.  Because you need the sort to use
@@ -286,30 +286,30 @@ fn split_box(
     */
 
     /* Sholdn't be needed - I use a stupid hasmap - should be refactored.
-    compareplanePlane = largestDimension;
-    qsort((char*) &colorfreqtable.table[boxStart], boxSize,
-          sizeof(colorfreqtable.table[boxStart]),
+    compareplanePlane = largest_dimension;
+    qsort((char*) &colorfreqtable.table[box_start], box_size,
+          sizeof(colorfreqtable.table[box_start]),
           compareplane);*/
 
     /* Now find the median based on the counts, so that about half
     the pixels (not colors, pixels) are in each subdivision.  */
-    let mut lowersum = colorfreqtable.get(&boxStart).unwrap().value; /* initial value */
+    let mut lowersum = colorfreqtable.get(&box_start).unwrap().value; /* initial value */
     let mut i = 1;
-    while i < boxSize - 1 && lowersum < sm / 2 {
-        lowersum += colorfreqtable.get(&(boxStart + i)).unwrap().value;
+    while i < box_size - 1 && lowersum < sm / 2 {
+        lowersum += colorfreqtable.get(&(box_start + i)).unwrap().value;
         i += 1;
     }
-    let medianIndex = i;
+    let median_idx = i;
     /* Split the box, and sort to bring the biggest boxes to the top.  */
 
-    bv[bi].colors = medianIndex;
+    bv[bi].colors = median_idx;
     bv[bi].sum = lowersum;
-    bv[*boxesP as usize].ind = boxStart + medianIndex;
-    bv[*boxesP as usize].colors = boxSize - medianIndex;
-    bv[*boxesP as usize].sum = sm - lowersum;
-    (*boxesP) += 1;
+    bv[*boxes as usize].ind = box_start + median_idx;
+    bv[*boxes as usize].colors = box_size - median_idx;
+    bv[*boxes as usize].sum = sm - lowersum;
+    (*boxes) += 1;
 
-    bv[0..*boxesP as usize].sort_by(BBox::sum_cmp);
+    bv[0..*boxes as usize].sort_by(BBox::sum_cmp);
     Ok(())
 }
 
@@ -324,9 +324,9 @@ fn mediancut(
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
     newcolors: i32,
-    methodForLargest: MethodForLargest,
-    methodForRep: MethodForRep,
-    colormapP: &mut HashMap<i32, Tuple>,
+    largest: MethodForLargest,
+    rep: MethodForRep,
+    colormap: &mut HashMap<i32, Tuple>,
 ) -> SixelResult<()> {
     let mut sum = 0;
 
@@ -338,10 +338,10 @@ fn mediancut(
     // there is more splitting we can do.
     let mut bv = new_box_vector(colorfreqtable.len() as i32, sum, newcolors);
     let mut boxes = 1;
-    let mut multicolorBoxesExist = colorfreqtable.len() > 1;
+    let mut multi_color_boxes_exist = colorfreqtable.len() > 1;
 
     // Main loop: split boxes until we have enough.
-    while boxes < newcolors && multicolorBoxesExist {
+    while boxes < newcolors && multi_color_boxes_exist {
         // Find the first splittable box.
         let mut bi = 0;
         while bi < boxes && bv[bi as usize].colors < 2 {
@@ -349,12 +349,12 @@ fn mediancut(
         }
 
         if bi >= boxes {
-            multicolorBoxesExist = false;
+            multi_color_boxes_exist = false;
         } else {
-            split_box(&mut bv, &mut boxes, bi as usize, colorfreqtable, depth, methodForLargest)?;
+            split_box(&mut bv, &mut boxes, bi as usize, colorfreqtable, depth, largest)?;
         }
     }
-    *colormapP = color_map_from_bv(newcolors, &bv, boxes, colorfreqtable, depth, methodForRep);
+    *colormap = color_map_from_bv(newcolors, &bv, boxes, colorfreqtable, depth, rep);
 
     Ok(())
 }
@@ -380,9 +380,9 @@ fn compute_histogram(
     data: &[u8],
     length: i32,
     depth: i32,
-    qualityMode: Quality,
+    quality: Quality,
 ) -> SixelResult<HashMap<i32, Tuple>> {
-    let (max_sample, mut step) = match qualityMode {
+    let (max_sample, mut step) = match quality {
         Quality::Low => (18_383, length / depth / 18_383 * depth),
         Quality::High => (18_383, length / depth / 18_383 * depth),
         Quality::Auto | Quality::HighColor | Quality::Full => {
@@ -437,14 +437,14 @@ fn compute_histogram(
 /// image stream in file 'ifP'.  Figure it out using the median cut
 /// technique.
 ///
-/// The colormap will have 'reqcolors' or fewer colors in it, unless
+/// The colormap will have 'req_colors' or fewer colors in it, unless
 /// 'allcolors' is true, in which case it will have all the colors that
 /// are in the input.
 ///
 /// The colormap has the same maxval as the input.
 ///
 /// Put the colormap in newly allocated storage as a tupletable2
-/// and return its address as *colormapP.  Return the number of colors in
+/// and return its address as *colormap.  Return the number of colors in
 /// it as *colorsP and its maxval as *colormapMaxvalP.
 ///
 /// Return the characteristics of the input file as
@@ -455,19 +455,19 @@ fn compute_color_map_from_input(
     data: &[u8],
     length: i32,
     depth: i32,
-    reqColors: i32,
-    methodForLargest: MethodForLargest,
-    methodForRep: MethodForRep,
-    qualityMode: Quality,
-    colormapP: &mut HashMap<i32, Tuple>,
+    req_colors: i32,
+    largest: MethodForLargest,
+    rep: MethodForRep,
+    quality: Quality,
+    colormap: &mut HashMap<i32, Tuple>,
     origcolors: &mut i32,
 ) -> SixelResult<()> {
-    let mut colorfreqtable = compute_histogram(data, length, depth, qualityMode)?;
+    let mut colorfreqtable = compute_histogram(data, length, depth, quality)?;
     *origcolors = colorfreqtable.len() as i32;
 
-    if colorfreqtable.len() as i32 <= reqColors {
+    if colorfreqtable.len() as i32 <= req_colors {
         /*
-        for i in colorfreqtable.len() as i32..=reqColors {
+        for i in colorfreqtable.len() as i32..=req_colors {
             let mut tuple: Vec<i32> = vec![0; depth as usize];
             for n in 0..depth {
                 tuple[n as usize] = (i * depth) + n;
@@ -476,17 +476,10 @@ fn compute_color_map_from_input(
         }*/
 
         for i in 0..colorfreqtable.len() as i32 {
-            colormapP.insert(i, colorfreqtable.get(&i).unwrap().clone());
+            colormap.insert(i, colorfreqtable.get(&i).unwrap().clone());
         }
     } else {
-        mediancut(
-            &mut colorfreqtable,
-            depth,
-            reqColors,
-            methodForLargest,
-            methodForRep,
-            colormapP,
-        )?;
+        mediancut(&mut colorfreqtable, depth, req_colors, largest, rep, colormap)?;
     }
     Ok(())
 }
@@ -783,12 +776,12 @@ pub(crate) fn sixel_quant_make_palette(
     data: &[u8],
     length: i32,
     pixelformat: PixelFormat,
-    reqcolors: i32,
+    req_colors: i32,
     ncolors: &mut i32,
     origcolors: &mut i32,
-    methodForLargest: MethodForLargest,
-    methodForRep: MethodForRep,
-    qualityMode: Quality,
+    largest: MethodForLargest,
+    rep: MethodForRep,
+    quality: Quality,
 ) -> SixelResult<Vec<u8>> {
     let result_depth = sixel_helper_compute_depth(pixelformat);
     // if (result_depth <= 0) { *result = NULL; goto end; }
@@ -799,10 +792,10 @@ pub(crate) fn sixel_quant_make_palette(
         data,
         length,
         depth as i32,
-        reqcolors,
-        methodForLargest,
-        methodForRep,
-        qualityMode,
+        req_colors,
+        largest,
+        rep,
+        quality,
         &mut colormap,
         origcolors,
     );
@@ -826,7 +819,7 @@ pub(crate) fn sixel_quant_apply_palette(
     depth: i32,
     palette: &mut Vec<u8>,
     reqcolor: i32,
-    methodForDiffuse: SixelDiffusion,
+    diffuse: SixelDiffusion,
     foptimize: bool,
     foptimize_palette: bool,
     complexion: i32,
@@ -846,7 +839,7 @@ pub(crate) fn sixel_quant_apply_palette(
     let f_diffuse = if depth != 3 {
         diffuse_none
     } else {
-        match methodForDiffuse {
+        match diffuse {
             SixelDiffusion::Auto | SixelDiffusion::None => diffuse_none,
             SixelDiffusion::Atkinson => diffuse_atkinson,
             SixelDiffusion::FS => diffuse_fs,
@@ -907,7 +900,7 @@ pub(crate) fn sixel_quant_apply_palette(
                     let pos = y * width + x;
                     for d in 0..depth {
                         let mut val = data[(pos * depth + d) as usize] as i32;
-                        if matches!(methodForDiffuse, SixelDiffusion::ADither) {
+                        if matches!(diffuse, SixelDiffusion::ADither) {
                             val += (mask_a(x, y, d) * 32.0) as i32;
                         } else {
                             val += (mask_x(x, y, d) * 32.0) as i32;
@@ -972,7 +965,7 @@ pub(crate) fn sixel_quant_apply_palette(
                     let pos = y * width + x;
                     for d in 0..depth {
                         let mut val = data[(pos * depth + d) as usize] as i32;
-                        if matches!(methodForDiffuse, SixelDiffusion::ADither) {
+                        if matches!(diffuse, SixelDiffusion::ADither) {
                             val += (mask_a(x, y, d) * 32.0) as i32;
                         } else {
                             val += (mask_x(x, y, d) * 32.0) as i32;
