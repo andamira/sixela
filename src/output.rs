@@ -31,32 +31,6 @@ pub struct SixelNode {
 /// - Derived from `sixel_output` struct in the `libsixel` C library.
 #[derive(Debug, Default, PartialEq, Eq, Hash)]
 pub struct SixelOutput<W: IoWrite> {
-    /* private compatiblity flags */
-    /// Indicates 8-bit terminal support.
-    ///
-    /// `false` for 7-bit, `true` for 8-bit.
-    pub(crate) has_8bit_control: bool,
-
-    /// Sixel scrolling support flag.
-    ///
-    /// `false` if terminal supports scrolling, `true` if not.
-    pub(crate) has_sixel_scrolling: bool,
-
-    /// Argument limit for repeat introducer (DECGRI).
-    ///
-    /// `false` if limited to 255, `true` if unlimited.
-    pub(crate) has_gri_arg_limit: bool,
-
-    /// DECSDM (CSI ? 80 h) sixel scrolling glitch flag.
-    ///
-    /// `false` enables sixel scrolling, `true` disables it.
-    pub(crate) has_sdm_glitch: bool,
-
-    /// Flag to skip DCS envelope handling.
-    ///
-    /// `false` to process, `true` to skip.
-    pub(crate) skip_dcs_envelope: bool,
-
     /* public fields */
     /// Palette selection mode.
     pub palette_type: PaletteType,
@@ -81,6 +55,32 @@ pub struct SixelOutput<W: IoWrite> {
 
     /// Buffer for output data.
     pub buffer: String,
+
+    /* private compatibility flags */
+    /// Indicates 8-bit terminal support.
+    ///
+    /// `false` for 7-bit, `true` for 8-bit.
+    pub(crate) has_8bit_control: bool,
+
+    /// Sixel scrolling support flag.
+    ///
+    /// `false` if terminal supports scrolling, `true` if not.
+    pub(crate) has_sixel_scrolling: bool,
+
+    /// Argument limit for repeat introducer (DECGRI).
+    ///
+    /// `false` if limited to 255, `true` if unlimited.
+    pub(crate) has_gri_arg_limit: bool,
+
+    /// DECSDM (CSI ? 80 h) sixel scrolling glitch flag.
+    ///
+    /// `false` enables sixel scrolling, `true` disables it.
+    pub(crate) has_sdm_glitch: bool,
+
+    /// Flag to skip DCS envelope handling.
+    ///
+    /// `false` to process, `true` to skip.
+    pub(crate) skip_dcs_envelope: bool,
 }
 
 impl<W: IoWrite> SixelOutput<W> {
@@ -108,12 +108,12 @@ impl<W: IoWrite> SixelOutput<W> {
         }
     }
 
-    /// get 8bit output mode which indicates whether it uses C1 control characters.
+    /// Get 8bit output mode which indicates whether it uses C1 control characters.
     #[inline]
+    #[must_use]
     pub fn get_8bit_availability(&self) -> bool {
         self.has_8bit_control
     }
-
     /// Set 8bit output mode state.
     #[inline]
     pub fn set_8bit_availability(&mut self, availability: bool) {

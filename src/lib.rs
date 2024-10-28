@@ -5,13 +5,7 @@
 
 //* global config *//
 //
-// lints
-#![deny(
-    // WAIT: [lazy_type_alias](https://github.com/rust-lang/rust/issues/112792)
-    type_alias_bounds, // detects bounds in type aliases
-    unsafe_op_in_unsafe_fn, // unsafe operations in unsafe functions without explicit unsafe block
-    clippy::missing_safety_doc, // deny if there's no # Safety section in public unsafe fns
-)]
+// lints cascade
 #![warn(
     // missing_docs, // missing docs for public items
     clippy::all, // (the default set of clippy lints)
@@ -36,13 +30,15 @@
     clippy::unnested_or_patterns, // unnested or-patterns, (Some(a)|Some(b) vs Some(a|b))
     clippy::unreadable_literal, //  long integral does not contain underscores
 )]
+#![deny(
+    type_alias_bounds, // detects bounds in type aliases
+    unsafe_op_in_unsafe_fn, // unsafe operations in unsafe functions without explicit unsafe block
+    clippy::missing_safety_doc, // deny if there's no # Safety section in public unsafe fns
+)]
 #![allow(
     clippy::identity_op, // * 1
     clippy::erasing_op,  // * 0
-    non_snake_case,
-    non_camel_case_types,
-    non_upper_case_globals,
-    clippy::upper_case_acronyms,
+    non_upper_case_globals, // TEMP
 )]
 //
 // nightly, safety, environment

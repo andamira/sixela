@@ -32,11 +32,10 @@ pub fn sixel_string(
     method_for_rep: MethodForRep,
     quality_mode: Quality,
 ) -> SixelResult<String> {
-    // IMPROVE:CHECK: we should make sure we receive positive values.
-    let mut sixel_data: Vec<u8> = Vec::new(); // MAYBE with_capacity?
+    let mut sixel_data: Vec<u8> = Vec::new(); // MAYBE with_capacity
 
-    let mut SixelOutput = SixelOutput::new(&mut sixel_data);
-    SixelOutput.set_encode_policy(EncodePolicy::Auto);
+    let mut sixel_output = SixelOutput::new(&mut sixel_data);
+    sixel_output.set_encode_policy(EncodePolicy::Auto);
     let mut dither_conf = DitherConf::new(256).unwrap();
 
     dither_conf.set_optimize_palette(true);
@@ -54,7 +53,7 @@ pub fn sixel_string(
     dither_conf.set_diffusion_method(method_for_diffuse);
 
     let mut bytes = bytes.to_vec();
-    SixelOutput.encode(&mut bytes, width, height, 0, &mut dither_conf)?;
+    sixel_output.encode(&mut bytes, width, height, 0, &mut dither_conf)?;
 
     Ok(String::from_utf8_lossy(&sixel_data).to_string())
 }
@@ -141,18 +140,6 @@ pub enum Quality {
     Full,
     /// High color
     HighColor,
-}
-
-/// Offset value of `PixelFormat`.
-///
-/// # Adaptation
-/// Derived from `formatType` enum in the `libsixel` C library.
-#[repr(u8)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum FormatType {
-    Color,     // 0
-    Grayscale, // (1 << 6)
-    Palette,   // (1 << 7)
 }
 
 /// Pixelformat type of input image
@@ -280,4 +267,16 @@ enum Loop {
 //     GD2,   //         0x9 /* read only with --with-gd configure option */
 //     PSD,   //         0xa /* read only */
 //     HDR,   //         0xb /* read only */
+// }
+
+// /// Offset value of `PixelFormat`.
+// ///
+// /// # Adaptation
+// /// Derived from `formatType` enum in the `libsixel` C library.
+// #[repr(u8)]
+// #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+// pub enum FormatType { // TODO:MAYBE
+//     Color,     // 0
+//     Grayscale, // (1 << 6)
+//     Palette,   // (1 << 7)
 // }
