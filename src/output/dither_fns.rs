@@ -1,4 +1,15 @@
-// sixela::tosixel::dither_fns
+// sixela::output::dither_fns
+//
+// TOC
+// - fn sixel_apply_15bpp_dither
+// - fn dither_func_none
+// - fn dither_func_fs
+// - fn dither_func_atkinson
+// - fn dither_func_jajuni
+// - fn dither_func_stucki
+// - fn dither_func_burkes
+// - fn dither_func_a_dither
+// - fn dither_func_x_dither
 
 use crate::SixelDiffusion;
 
@@ -46,26 +57,6 @@ pub(super) fn sixel_apply_15bpp_dither(
         SixelDiffusion::XDither => {
             dither_func_x_dither(pixels, width, x, y);
         }
-    }
-}
-
-/// TODO
-fn dither_func_a_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
-    for c in 0..3 {
-        let mask = (((x + c * 17) + y * 236) * 119) & 255;
-        let mask = (mask - 128) / 256;
-        let value = data[c as usize] as i32 + mask;
-        data[c as usize] = value.clamp(0, 255) as u8;
-    }
-}
-
-/// TODO
-fn dither_func_x_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
-    for c in 0..3 {
-        let mask = ((((x + c * 17) ^ y) * 236) * 1234) & 511;
-        let mask = (mask - 128) / 512;
-        let value = data[c as usize] as i32 + mask;
-        data[c as usize] = value.clamp(0, 255) as u8;
     }
 }
 
@@ -394,4 +385,24 @@ fn dither_func_burkes(data: &mut [u8], width: i32) {
     data[(width * 1 + 2) * 3 + 0] = if r > 0xff { 0xff } else { r as u8 };
     data[(width * 1 + 2) * 3 + 1] = if g > 0xff { 0xff } else { g as u8 };
     data[(width * 1 + 2) * 3 + 2] = if b > 0xff { 0xff } else { b as u8 };
+}
+
+/// TODO
+fn dither_func_a_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
+    for c in 0..3 {
+        let mask = (((x + c * 17) + y * 236) * 119) & 255;
+        let mask = (mask - 128) / 256;
+        let value = data[c as usize] as i32 + mask;
+        data[c as usize] = value.clamp(0, 255) as u8;
+    }
+}
+
+/// TODO
+fn dither_func_x_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
+    for c in 0..3 {
+        let mask = ((((x + c * 17) ^ y) * 236) * 1234) & 511;
+        let mask = (mask - 128) / 512;
+        let value = data[c as usize] as i32 + mask;
+        data[c as usize] = value.clamp(0, 255) as u8;
+    }
 }

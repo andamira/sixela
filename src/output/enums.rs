@@ -1,62 +1,18 @@
-// sixela::other
-
-use crate::all::{DitherConf, SixelOutput, SixelResult};
-use devela::{String, ToString, Vec};
-
-/// Writes a string of sixel data.
-///
-/// # Example
-/// ```
-/// # use sixela::*;
-/// // 2x2 pixels (Red, Green, Blue, White)
-/// const IMAGE_HEX: &[u8] = b"FF000000FF000000FFFFFFFF";
-///                          //RRGGBBrrggbbRRGGBBrrggbb
-///
-/// println!("{}", sixel_string(
-///     IMAGE_HEX, 2, 2,
-///     PixelFormat::RGB888,
-///     SixelDiffusion::Stucki,
-///     MethodForLargest::Auto,
-///     MethodForRep::Auto,
-///     Quality::Auto
-/// ).unwrap());
-/// ```
-#[expect(clippy::too_many_arguments)]
-pub fn sixel_string(
-    bytes: &[u8],
-    width: i32,
-    height: i32,
-    pixelformat: PixelFormat,
-    method_for_diffuse: SixelDiffusion,
-    method_for_largest: MethodForLargest,
-    method_for_rep: MethodForRep,
-    quality_mode: Quality,
-) -> SixelResult<String> {
-    let mut sixel_data: Vec<u8> = Vec::new(); // MAYBE with_capacity
-
-    let mut sixel_output = SixelOutput::new(&mut sixel_data);
-    sixel_output.set_encode_policy(EncodePolicy::Auto);
-    let mut dither_conf = DitherConf::new(256).unwrap();
-
-    dither_conf.set_optimize_palette(true);
-
-    dither_conf.initialize(
-        bytes,
-        width,
-        height,
-        pixelformat,
-        method_for_largest,
-        method_for_rep,
-        quality_mode,
-    )?;
-    dither_conf.set_pixelformat(pixelformat);
-    dither_conf.set_diffusion_method(method_for_diffuse);
-
-    let mut bytes = bytes.to_vec();
-    sixel_output.encode(&mut bytes, width, height, 0, &mut dither_conf)?;
-
-    Ok(String::from_utf8_lossy(&sixel_data).to_string())
-}
+// sixela::output::enums
+//
+// TOC
+// - enum MethodForLargest
+// - enum MethodForRep
+// - enum SixelDiffusion
+// - enum Quality
+// - enum PixelFormat
+// - enum EncodePolicy
+// - enum PaletteType
+// - enum Loop
+// - //
+//   - enum ResampleMethod
+//   - enum Format
+//   - enum FormatType
 
 /// Method for finding the largest dimension for splitting,
 /// and sorting by that component.
@@ -142,50 +98,37 @@ pub enum Quality {
     HighColor,
 }
 
-/// Pixelformat type of input image
+/// Pixel format type of input image.
 ///
 /// # Adaptation
 /// Derived from `pixelFormat` enum in the `libsixel` C library.
 //
 // NOTE: for compatibility, the value of PIXELFORMAT_COLOR_RGB888 must be 3
 #[repr(u8)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub enum PixelFormat {
-    RGB555 = 1,             // (SIXEL_FORMATTYPE_COLOR     | 0x01) /* 15bpp */
-    RGB565 = 2,             // (SIXEL_FORMATTYPE_COLOR     | 0x02) /* 16bpp */
-    RGB888 = 3,             // (SIXEL_FORMATTYPE_COLOR     | 0x03) /* 24bpp */
-    BGR555 = 4,             // (SIXEL_FORMATTYPE_COLOR     | 0x04) /* 15bpp */
-    BGR565 = 5,             // (SIXEL_FORMATTYPE_COLOR     | 0x05) /* 16bpp */
-    BGR888 = 6,             // (SIXEL_FORMATTYPE_COLOR     | 0x06) /* 24bpp */
-    ARGB8888 = 0x10,        // (SIXEL_FORMATTYPE_COLOR     | 0x10) /* 32bpp */
-    RGBA8888 = 0x11,        // (SIXEL_FORMATTYPE_COLOR     | 0x11) /* 32bpp */
-    ABGR8888 = 0x12,        // (SIXEL_FORMATTYPE_COLOR     | 0x12) /* 32bpp */
-    BGRA8888 = 0x13,        // (SIXEL_FORMATTYPE_COLOR     | 0x13) /* 32bpp */
-    G1 = (1 << 6),          // (SIXEL_FORMATTYPE_GRAYSCALE | 0x00) /* 1bpp grayscale */
-    G2 = (1 << 6) | 0x01,   // (SIXEL_FORMATTYPE_GRAYSCALE | 0x01) /* 2bpp grayscale */
-    G4 = (1 << 6) | 0x02,   // (SIXEL_FORMATTYPE_GRAYSCALE | 0x02) /* 4bpp grayscale */
-    G8 = (1 << 6) | 0x03,   // (SIXEL_FORMATTYPE_GRAYSCALE | 0x03) /* 8bpp grayscale */
+    RGB555 = 1, // (SIXEL_FORMATTYPE_COLOR     | 0x01) /* 15bpp */
+    RGB565 = 2, // (SIXEL_FORMATTYPE_COLOR     | 0x02) /* 16bpp */
+    /// RGB 24bpp (Default).
+    #[default]
+    RGB888 = 3, // (SIXEL_FORMATTYPE_COLOR     | 0x03) /* 24bpp */
+    BGR555 = 4, // (SIXEL_FORMATTYPE_COLOR     | 0x04) /* 15bpp */
+    BGR565 = 5, // (SIXEL_FORMATTYPE_COLOR     | 0x05) /* 16bpp */
+    BGR888 = 6, // (SIXEL_FORMATTYPE_COLOR     | 0x06) /* 24bpp */
+    ARGB8888 = 0x10, // (SIXEL_FORMATTYPE_COLOR     | 0x10) /* 32bpp */
+    RGBA8888 = 0x11, // (SIXEL_FORMATTYPE_COLOR     | 0x11) /* 32bpp */
+    ABGR8888 = 0x12, // (SIXEL_FORMATTYPE_COLOR     | 0x12) /* 32bpp */
+    BGRA8888 = 0x13, // (SIXEL_FORMATTYPE_COLOR     | 0x13) /* 32bpp */
+    G1 = (1 << 6), // (SIXEL_FORMATTYPE_GRAYSCALE | 0x00) /* 1bpp grayscale */
+    G2 = (1 << 6) | 0x01, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x01) /* 2bpp grayscale */
+    G4 = (1 << 6) | 0x02, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x02) /* 4bpp grayscale */
+    G8 = (1 << 6) | 0x03, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x03) /* 8bpp grayscale */
     AG88 = (1 << 6) | 0x13, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x13) /* 16bpp gray+alpha */
     GA88 = (1 << 6) | 0x23, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x23) /* 16bpp gray+alpha */
-    PAL1 = (1 << 7),        // (SIXEL_FORMATTYPE_PALETTE   | 0x00) /* 1bpp palette */
+    PAL1 = (1 << 7), // (SIXEL_FORMATTYPE_PALETTE   | 0x00) /* 1bpp palette */
     PAL2 = (1 << 7) | 0x01, // (SIXEL_FORMATTYPE_PALETTE   | 0x01) /* 2bpp palette */
     PAL4 = (1 << 7) | 0x02, // (SIXEL_FORMATTYPE_PALETTE   | 0x02) /* 4bpp palette */
     PAL8 = (1 << 7) | 0x03, // (SIXEL_FORMATTYPE_PALETTE   | 0x03) /* 8bpp palette */
-}
-
-/// Palette type.
-///
-/// # Adaptation
-/// Derived from `paletteType` enum in the `libsixel` C library.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub enum PaletteType {
-    /// Choose palette type automatically.
-    #[default]
-    Auto,
-    /// HLS colorspace.
-    HLS,
-    /// RGB colorspace.
-    RGB,
 }
 
 /// Policies of SIXEL encoding.
@@ -202,6 +145,21 @@ pub enum EncodePolicy {
     Fast = 1,
     /// Encode to as small sixel sequence as possible.
     Size = 2,
+}
+
+/// Palette type.
+///
+/// # Adaptation
+/// Derived from `paletteType` enum in the `libsixel` C library.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum PaletteType {
+    /// Choose palette type automatically.
+    #[default]
+    Auto,
+    /// HLS colorspace.
+    HLS,
+    /// RGB colorspace.
+    RGB,
 }
 
 /// Loop mode.

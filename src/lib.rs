@@ -56,9 +56,7 @@ compile_error!("You can't enable `safe` and `unsafe*` features at the same time.
 
 mod dither;
 mod error;
-mod other;
 mod output;
-mod tosixel;
 // no public items:
 mod pixelformat;
 mod quant;
@@ -67,17 +65,7 @@ mod quant;
 #[doc(hidden)]
 pub mod all {
     #[doc(inline)]
-    pub use super::{dither::*, error::*, other::*, output::*};
+    pub use super::{dither::*, error::*, output::*};
 }
 #[doc(inline)]
 pub use all::*;
-
-// const SIXEL_PALETTE_MIN: usize = 2;
-const SIXEL_PALETTE_MAX: usize = 256;
-// const SIXEL_USE_DEPRECATED_SYMBOLS: usize = 1;
-// const SIXEL_ALLOCATE_BYTES_MAX: usize = 10_248 * 1_024 * 128; /* up to 128M */
-// const SIXEL_WIDTH_LIMIT: usize = 1_000_000;
-// const SIXEL_HEIGHT_LIMIT: usize = 1_000_000;
-
-// loader settings
-// const SIXEL_DEFALUT_GIF_DELAY: usize = 1;
