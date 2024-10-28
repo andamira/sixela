@@ -2,7 +2,7 @@
 
 use crate::SixelDiffusion;
 
-//
+/// TODO
 pub(super) fn sixel_apply_15bpp_dither(
     pixels: &mut [u8],
     x: i32,
@@ -49,6 +49,7 @@ pub(super) fn sixel_apply_15bpp_dither(
     }
 }
 
+/// TODO
 fn dither_func_a_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
     for c in 0..3 {
         let mask = (((x + c * 17) + y * 236) * 119) & 255;
@@ -58,6 +59,7 @@ fn dither_func_a_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
     }
 }
 
+/// TODO
 fn dither_func_x_dither(data: &mut [u8], _width: i32, x: i32, y: i32) {
     for c in 0..3 {
         let mask = ((((x + c * 17) ^ y) * 236) * 1234) & 511;

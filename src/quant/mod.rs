@@ -1,5 +1,8 @@
 // sixela::quant
 
+mod diffuse_fns;
+use diffuse_fns::*;
+
 use crate::{
     pixelformat::sixel_helper_compute_depth, MethodForLargest, MethodForRep, PixelFormat, Quality,
     SixelDiffusion, SixelError, SixelResult,
@@ -508,142 +511,6 @@ fn error_diffuse(
 /// No diffusion.
 #[inline] #[rustfmt::skip]
 fn diffuse_none(_: &mut [u8], _: i32, _h: i32, _x: i32, _y: i32, _: i32, _: i32) {}
-
-/// Floyd Steinberg Method
-///          curr    7/16
-///  3/16    5/48    1/16
-///
-fn diffuse_fs(data: &mut [u8], width: i32, height: i32, x: i32, y: i32, depth: i32, error: i32) {
-    let pos = y * width + x;
-    if x < width - 1 && y < height - 1 {
-        // add error to the right cell
-        error_diffuse(data, pos + width * 0 + 1, depth, error, 7, 16);
-        // add error to the left-bottom cell
-        error_diffuse(data, pos + width * 1 - 1, depth, error, 3, 16);
-        // add error to the bottom cell
-        error_diffuse(data, pos + width * 1 + 0, depth, error, 5, 16);
-        // add error to the right-bottom cell
-        error_diffuse(data, pos + width * 1 + 1, depth, error, 1, 16);
-    }
-}
-
-/// Atkinson's Method
-///          curr    1/8    1/8
-///   1/8     1/8    1/8
-///           1/8
-///
-fn diffuse_atkinson(
-    data: &mut [u8],
-    width: i32,
-    height: i32,
-    x: i32,
-    y: i32,
-    depth: i32,
-    error: i32,
-) {
-    let pos = y * width + x;
-    if y < height - 2 {
-        // add error to the right cell
-        error_diffuse(data, pos + width * 0 + 1, depth, error, 1, 8);
-        // add error to the 2th right cell
-        error_diffuse(data, pos + width * 0 + 2, depth, error, 1, 8);
-        // add error to the left-bottom cell
-        error_diffuse(data, pos + width * 1 - 1, depth, error, 1, 8);
-        // add error to the bottom cell
-        error_diffuse(data, pos + width * 1 + 0, depth, error, 1, 8);
-        // add error to the right-bottom cell
-        error_diffuse(data, pos + width * 1 + 1, depth, error, 1, 8);
-        // add error to the 2th bottom cell
-        error_diffuse(data, pos + width * 2 + 0, depth, error, 1, 8);
-    }
-}
-
-/// Jarvis, Judice & Ninke Method
-///                  curr    7/48    5/48
-///  3/48    5/48    7/48    5/48    3/48
-///  1/48    3/48    5/48    3/48    1/48
-///
-fn diffuse_jajuni(
-    data: &mut [u8],
-    width: i32,
-    height: i32,
-    x: i32,
-    y: i32,
-    depth: i32,
-    error: i32,
-) {
-    let pos = y * width + x;
-    if pos < (height - 2) * width - 2 {
-        error_diffuse(data, pos + width * 0 + 1, depth, error, 7, 48);
-        error_diffuse(data, pos + width * 0 + 2, depth, error, 5, 48);
-        error_diffuse(data, pos + width * 1 - 2, depth, error, 3, 48);
-        error_diffuse(data, pos + width * 1 - 1, depth, error, 5, 48);
-        error_diffuse(data, pos + width * 1 + 0, depth, error, 7, 48);
-        error_diffuse(data, pos + width * 1 + 1, depth, error, 5, 48);
-        error_diffuse(data, pos + width * 1 + 2, depth, error, 3, 48);
-        error_diffuse(data, pos + width * 2 - 2, depth, error, 1, 48);
-        error_diffuse(data, pos + width * 2 - 1, depth, error, 3, 48);
-        error_diffuse(data, pos + width * 2 + 0, depth, error, 5, 48);
-        error_diffuse(data, pos + width * 2 + 1, depth, error, 3, 48);
-        error_diffuse(data, pos + width * 2 + 2, depth, error, 1, 48);
-    }
-}
-
-/// Stucki's Method
-///                  curr    8/48    4/48
-///  2/48    4/48    8/48    4/48    2/48
-///  1/48    2/48    4/48    2/48    1/48
-///
-fn diffuse_stucki(
-    data: &mut [u8],
-    width: i32,
-    height: i32,
-    x: i32,
-    y: i32,
-    depth: i32,
-    error: i32,
-) {
-    let pos = y * width + x;
-    if pos < (height - 2) * width - 2 {
-        error_diffuse(data, pos + width * 0 + 1, depth, error, 1, 6);
-        error_diffuse(data, pos + width * 0 + 2, depth, error, 1, 12);
-        error_diffuse(data, pos + width * 1 - 2, depth, error, 1, 24);
-        error_diffuse(data, pos + width * 1 - 1, depth, error, 1, 12);
-        error_diffuse(data, pos + width * 1 + 0, depth, error, 1, 6);
-        error_diffuse(data, pos + width * 1 + 1, depth, error, 1, 12);
-        error_diffuse(data, pos + width * 1 + 2, depth, error, 1, 24);
-        error_diffuse(data, pos + width * 2 - 2, depth, error, 1, 48);
-        error_diffuse(data, pos + width * 2 - 1, depth, error, 1, 24);
-        error_diffuse(data, pos + width * 2 + 0, depth, error, 1, 12);
-        error_diffuse(data, pos + width * 2 + 1, depth, error, 1, 24);
-        error_diffuse(data, pos + width * 2 + 2, depth, error, 1, 48);
-    }
-}
-
-/// Burkes' Method
-///                  curr    4/16    2/16
-///  1/16    2/16    4/16    2/16    1/16
-///
-fn diffuse_burkes(
-    data: &mut [u8],
-    width: i32,
-    height: i32,
-    x: i32,
-    y: i32,
-    depth: i32,
-    error: i32,
-) {
-    let pos = y * width + x;
-    if pos < (height - 1) * width - 2 {
-        error_diffuse(data, pos + width * 0 + 1, depth, error, 1, 4);
-        error_diffuse(data, pos + width * 0 + 2, depth, error, 1, 8);
-        error_diffuse(data, pos + width * 1 - 2, depth, error, 1, 16);
-        error_diffuse(data, pos + width * 1 - 1, depth, error, 1, 8);
-        error_diffuse(data, pos + width * 1 + 0, depth, error, 1, 4);
-        error_diffuse(data, pos + width * 1 + 1, depth, error, 1, 8);
-        error_diffuse(data, pos + width * 1 + 2, depth, error, 1, 16);
-    }
-}
 
 /// TODO
 #[inline]
