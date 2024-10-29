@@ -14,6 +14,8 @@
 //   - enum Format
 //   - enum FormatType
 
+use devela::ConstDefault;
+
 /// Method for finding the largest dimension for splitting,
 /// and sorting by that component.
 ///
@@ -30,6 +32,8 @@ pub enum MethodForLargest {
     /// Transforming into luminosities before the comparison.
     Lum,
 }
+#[rustfmt::skip]
+impl ConstDefault for MethodForLargest { const DEFAULT: Self = Self::Auto; }
 
 /// Method for choosing a color from the box.
 ///
@@ -49,6 +53,8 @@ pub enum MethodForRep {
     /// Choose the average all the pixels in the box.
     Pixels,
 }
+#[rustfmt::skip]
+impl ConstDefault for MethodForRep { const DEFAULT: Self = Self::Auto; }
 
 /// Method of diffusion.
 ///
@@ -77,6 +83,8 @@ pub enum SixelDiffusion {
     /// Positionally stable arithmetic xor based dither.
     XDither = 8,
 }
+#[rustfmt::skip]
+impl ConstDefault for SixelDiffusion { const DEFAULT: Self = Self::Auto; }
 
 /// Quality modes.
 ///
@@ -97,6 +105,8 @@ pub enum Quality {
     /// High color
     HighColor,
 }
+#[rustfmt::skip]
+impl ConstDefault for Quality { const DEFAULT: Self = Self::Auto; }
 
 /// Pixel format type of input image.
 ///
@@ -130,6 +140,8 @@ pub enum PixelFormat {
     PAL4 = (1 << 7) | 0x02, // (SIXEL_FORMATTYPE_PALETTE   | 0x02) /* 4bpp palette */
     PAL8 = (1 << 7) | 0x03, // (SIXEL_FORMATTYPE_PALETTE   | 0x03) /* 8bpp palette */
 }
+#[rustfmt::skip]
+impl ConstDefault for PixelFormat { const DEFAULT: Self = Self::RGB888; }
 
 /// Policies of SIXEL encoding.
 ///
@@ -146,6 +158,8 @@ pub enum EncodePolicy {
     /// Encode to as small sixel sequence as possible.
     Size = 2,
 }
+#[rustfmt::skip]
+impl ConstDefault for EncodePolicy { const DEFAULT: Self = Self::Auto; }
 
 /// Palette type.
 ///
@@ -161,6 +175,8 @@ pub enum PaletteType {
     /// RGB colorspace.
     RGB,
 }
+#[rustfmt::skip]
+impl ConstDefault for PaletteType { const DEFAULT: Self = Self::Auto; }
 
 /// Loop mode.
 ///
@@ -178,6 +194,8 @@ enum Loop {
     /// Always disable loop.
     Disable,
 }
+#[rustfmt::skip]
+impl ConstDefault for Loop { const DEFAULT: Self = Self::Auto; }
 
 // /// Method of resampling.
 // ///
