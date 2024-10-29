@@ -1,5 +1,7 @@
 // sixela::dither::palettes
 
+#![allow(unused, reason = "commented out for now")]
+
 /// monochrome terminal with dark background
 pub(crate) const pal_mono_dark: [u8; 6] = [0x00, 0x00, 0x00, 0xff, 0xff, 0xff];
 

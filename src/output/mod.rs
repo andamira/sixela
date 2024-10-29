@@ -46,7 +46,7 @@ const PALETTE_CHANGE: i32 = 2;
 /// # Adaptation
 /// - Derived from `sixel_node` struct in the `libsixel` C library.
 #[derive(Debug, Default, PartialEq, Eq, Hash)]
-pub struct SixelNode {
+pub(crate) struct SixelNode {
     /// Index of the color in the palette.
     pub pal: i32,
     /// Start x-coordinate of the tile.
@@ -65,7 +65,7 @@ pub struct SixelNode {
 /// # Adaptation
 /// - Derived from `sixel_output` struct in the `libsixel` C library.
 #[derive(Debug, Default, PartialEq, Eq, Hash)]
-pub struct SixelOutput<W: IoWrite> {
+pub(crate) struct SixelOutput<W: IoWrite> {
     /* public fields
      */
     /// Palette selection mode.
@@ -120,6 +120,7 @@ pub struct SixelOutput<W: IoWrite> {
     pub(crate) skip_dcs_envelope: bool,
 }
 
+#[allow(dead_code, reason = "crate private struct")]
 impl<W: IoWrite> SixelOutput<W> {
     /// Packet size limit.
     pub(crate) const PACKET_SIZE: usize = 16_384;
@@ -508,7 +509,7 @@ impl<W: IoWrite> SixelOutput<W> {
         let mut map: Vec<u8> = vec![0; len];
 
         if !bodyonly && (ncolors != 2 || keycolor == (-1)) {
-            if matches!(self.palette_type, PaletteType::HLS) {
+            if matches!(self.palette_type, PaletteType::Hls) {
                 for n in 0..ncolors {
                     self.output_hls_palette_definition(palette, n as i32, keycolor)?;
                 }

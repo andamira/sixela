@@ -54,10 +54,10 @@ compile_error!("You can't enable the `std` and `no_std` features at the same tim
 #[cfg(all(feature = "safe", feature = "unsafe"))]
 compile_error!("You can't enable `safe` and `unsafe*` features at the same time.");
 
-mod dither;
 mod error;
 mod output;
 // no public items:
+mod dither;
 mod pixelformat;
 mod quant;
 
@@ -65,7 +65,8 @@ mod quant;
 #[doc(hidden)]
 pub mod all {
     #[doc(inline)]
-    pub use super::{dither::*, error::*, output::*};
+    #[allow(unused_imports, reason = "crate private items")]
+    pub use super::{dither::*, error::*, output::*, pixelformat::*, quant::*};
 }
 #[doc(inline)]
 pub use all::*;

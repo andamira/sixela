@@ -199,8 +199,9 @@ impl PixelFormat {
 /// # Adaptation
 /// Derived from `encodePolicy` enum in the `libsixel` C library.
 #[repr(u8)]
+#[allow(dead_code, reason = "Fast variant never constructed")]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub enum EncodePolicy {
+pub(crate) enum EncodePolicy {
     /// Choose encoding policy automatically (default).
     #[default]
     Auto = 0,
@@ -216,15 +217,17 @@ impl ConstDefault for EncodePolicy { const DEFAULT: Self = Self::Auto; }
 ///
 /// # Adaptation
 /// Derived from `paletteType` enum in the `libsixel` C library.
+#[repr(u8)]
+#[allow(dead_code, reason = "Some variants are never constructed")]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub enum PaletteType {
+pub(crate) enum PaletteType {
     /// Choose palette type automatically.
     #[default]
     Auto,
     /// HLS colorspace.
-    HLS,
+    Hls,
     /// RGB colorspace.
-    RGB,
+    Rgb,
 }
 #[rustfmt::skip]
 impl ConstDefault for PaletteType { const DEFAULT: Self = Self::Auto; }

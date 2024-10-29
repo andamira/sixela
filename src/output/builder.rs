@@ -7,7 +7,7 @@ use crate::{
 };
 use devela::{ConstDefault, String, ToString, Vec};
 
-/// A configurable sixel builder from a slice of pixel data.
+/// A configurable sixel string builder from a slice of pixel data bytes.
 ///
 /// By default it assumes `RGB888` PixelFormat, and `Auto`matic `SixelDiffusion`,
 /// `LargestDim`, `RepColor` and `Quality`.

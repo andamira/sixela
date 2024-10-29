@@ -1,5 +1,7 @@
 // sixela::dither
 
+#![allow(dead_code, reason = "crate private structs")]
+
 mod palettes;
 use palettes::*;
 
@@ -13,34 +15,34 @@ use crate::{
     SIXEL_PALETTE_MAX,
 };
 
-/// Predefined dithering modes for sixel output.
-///
-/// # Adaptation
-/// - Derived from `sixel_builtin_dither_t` in the `libsixel` C library.
-/// - Represents various terminal and grayscale dithering options.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum DitherMode {
-    /// monochrome terminal with dark background
-    MonoDark,
-    /// monochrome terminal with light background
-    MonoLight,
-    /// xterm 16color
-    XTerm16,
-    /// xterm 256color
-    XTerm256,
-    /// vt340 monochrome
-    VT340Mono,
-    /// vt340 color
-    VT340Color,
-    /// 1bit grayscale
-    G1,
-    /// 2bit grayscale
-    G2,
-    /// 4bit grayscale
-    G4,
-    /// 8bit grayscale
-    G8,
-}
+// /// Predefined dithering modes for sixel output.
+// ///
+// /// # Adaptation
+// /// - Derived from `sixel_builtin_dither_t` in the `libsixel` C library.
+// /// - Represents various terminal and grayscale dithering options.
+// #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+// pub enum DitherMode {
+//     /// monochrome terminal with dark background
+//     MonoDark,
+//     /// monochrome terminal with light background
+//     MonoLight,
+//     /// xterm 16color
+//     XTerm16,
+//     /// xterm 256color
+//     XTerm256,
+//     /// vt340 monochrome
+//     VT340Mono,
+//     /// vt340 color
+//     VT340Color,
+//     /// 1bit grayscale
+//     G1,
+//     /// 2bit grayscale
+//     G2,
+//     /// 4bit grayscale
+//     G4,
+//     /// 8bit grayscale
+//     G8,
+// }
 
 /// Configuration for sixel dithering.
 ///
@@ -49,7 +51,7 @@ pub enum DitherMode {
 /// - Based on `sixel_dither_t` from the `libsixel` C library,
 ///   adapted with adjustments for idiomatic Rust usage.
 #[derive(Debug)]
-pub struct DitherConf {
+pub(crate) struct DitherConf {
     /// Palette definition.
     pub palette: Vec<u8>,
     /// Cache table.
@@ -118,28 +120,28 @@ impl DitherConf {
         })
     }
 
-    /// TODO
-    pub fn new_mode(dither_mode: DitherMode) -> SixelResult<Self> {
-        let (ncolors, palette, keycolor) = match dither_mode {
-            DitherMode::MonoDark => (2, pal_mono_dark.to_vec(), 0),
-            DitherMode::MonoLight => (2, pal_mono_light.to_vec(), 0),
-            DitherMode::XTerm16 => (16, pal_xterm256.to_vec(), -1),
-            DitherMode::XTerm256 => (256, pal_xterm256.to_vec(), -1),
-            DitherMode::VT340Mono => (16, pal_vt340_mono.to_vec(), -1),
-            DitherMode::VT340Color => (16, pal_vt340_color.to_vec(), -1),
-            DitherMode::G1 => (2, pal_gray_1bit.to_vec(), -1),
-            DitherMode::G2 => (4, pal_gray_2bit.to_vec(), -1),
-            DitherMode::G4 => (16, pal_gray_4bit.to_vec(), -1),
-            DitherMode::G8 => (256, pal_gray_8bit.to_vec(), -1),
-        };
-
-        let mut result = DitherConf::new(ncolors)?;
-        result.palette = palette;
-        result.keycolor = keycolor;
-        result.optimized = true;
-        result.optimize_palette = false;
-        Ok(result)
-    }
+    // /// MAYBE
+    // pub fn new_mode(dither_mode: DitherMode) -> SixelResult<Self> {
+    //     let (ncolors, palette, keycolor) = match dither_mode {
+    //         DitherMode::MonoDark => (2, pal_mono_dark.to_vec(), 0),
+    //         DitherMode::MonoLight => (2, pal_mono_light.to_vec(), 0),
+    //         DitherMode::XTerm16 => (16, pal_xterm256.to_vec(), -1),
+    //         DitherMode::XTerm256 => (256, pal_xterm256.to_vec(), -1),
+    //         DitherMode::VT340Mono => (16, pal_vt340_mono.to_vec(), -1),
+    //         DitherMode::VT340Color => (16, pal_vt340_color.to_vec(), -1),
+    //         DitherMode::G1 => (2, pal_gray_1bit.to_vec(), -1),
+    //         DitherMode::G2 => (4, pal_gray_2bit.to_vec(), -1),
+    //         DitherMode::G4 => (16, pal_gray_4bit.to_vec(), -1),
+    //         DitherMode::G8 => (256, pal_gray_8bit.to_vec(), -1),
+    //     };
+    //
+    //     let mut result = DitherConf::new(ncolors)?;
+    //     result.palette = palette;
+    //     result.keycolor = keycolor;
+    //     result.optimized = true;
+    //     result.optimize_palette = false;
+    //     Ok(result)
+    // }
 
     /// TODO
     pub fn set_method_for_largest(&mut self, method_for_largest: LargestDim) {
