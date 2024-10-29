@@ -4,7 +4,7 @@ mod palettes;
 use palettes::*;
 
 use alloc::vec;
-use devela::{Box, Vec};
+use devela::Vec;
 
 use crate::{
     pixelformat::sixel_helper_normalize_pixelformat,
@@ -90,10 +90,10 @@ impl DitherConf {
             Quality::HighColor
         } else {
             if ncolors > SIXEL_PALETTE_MAX as i32 {
-                return Err(Box::new(SixelError::BadInput));
+                return Err(SixelError::BadInput);
             }
             if ncolors < 1 {
-                return Err(Box::new(SixelError::BadInput));
+                return Err(SixelError::BadInput);
                 // sixel_helper_set_additional_message(
                 // "DitherConf::new: palette ncolors must be more than 0");
             }

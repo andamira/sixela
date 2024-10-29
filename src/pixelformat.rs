@@ -1,7 +1,6 @@
 // sixela::pixelformat
 
 use crate::{PixelFormat, SixelError, SixelResult};
-use devela::Box;
 
 /// TODO
 fn get_rgb(data: &[u8], pixelformat: PixelFormat, depth: usize) -> (u8, u8, u8) {
@@ -133,7 +132,7 @@ fn expand_palette(
         }
 
         //          sixel_helper_set_additional_message(    "expand_palette: invalid pixelformat.");
-        _ => return Err(Box::new(SixelError::BadArgument)),
+        _ => return Err(SixelError::BadArgument),
     };
     let mut dst_offset = 0;
     let mut src_offset = 0;

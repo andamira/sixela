@@ -8,7 +8,7 @@ use crate::{
     dither::DitherConf, pixelformat::sixel_helper_normalize_pixelformat, SixelError, SixelResult,
 };
 use alloc::{format, vec};
-use devela::{sys::Write as IoWrite, Box, String, Vec};
+use devela::{sys::Write as IoWrite, String, Vec};
 
 mod dither_fns;
 use dither_fns::*;
@@ -500,7 +500,7 @@ impl<W: IoWrite> SixelOutput<W> {
         palstate: Option<&[i32]>,
     ) -> SixelResult<()> {
         if palette.is_empty() {
-            return Err(Box::new(SixelError::BadArgument));
+            return Err(SixelError::BadArgument);
         }
         let len = ncolors * width as usize;
         self.active_palette = -1;
@@ -539,7 +539,7 @@ impl<W: IoWrite> SixelOutput<W> {
                     /*sixel_helper_set_additional_message(
                     "sixel_encode_body: integer overflow detected."
                     " (y > INT_MAX)");*/
-                    return Err(Box::new(SixelError::BadIntegerOverflow));
+                    return Err(SixelError::BadIntegerOverflow);
                 }
                 let mut check_integer_overflow = y * width;
                 if check_integer_overflow > i32::MAX - x {
@@ -547,7 +547,7 @@ impl<W: IoWrite> SixelOutput<W> {
                     /*sixel_helper_set_additional_message(
                     "sixel_encode_body: integer overflow detected."
                     " (y * width > INT_MAX - x)");*/
-                    return Err(Box::new(SixelError::BadIntegerOverflow));
+                    return Err(SixelError::BadIntegerOverflow);
                 }
                 pix = pixels[(check_integer_overflow + x) as usize] as i32; /* color index */
                 if pix >= 0 && (pix as usize) < ncolors && pix != keycolor {
@@ -556,7 +556,7 @@ impl<W: IoWrite> SixelOutput<W> {
                         /*sixel_helper_set_additional_message(
                         "sixel_encode_body: integer overflow detected."
                         " (pix > INT_MAX / width)");*/
-                        return Err(Box::new(SixelError::BadIntegerOverflow));
+                        return Err(SixelError::BadIntegerOverflow);
                     }
                     check_integer_overflow = pix * width;
                     if check_integer_overflow > i32::MAX - x {
@@ -564,7 +564,7 @@ impl<W: IoWrite> SixelOutput<W> {
                         /*sixel_helper_set_additional_message(
                         "sixel_encode_body: integer overflow detected."
                         " (pix * width > INT_MAX - x)");*/
-                        return Err(Box::new(SixelError::BadIntegerOverflow));
+                        return Err(SixelError::BadIntegerOverflow);
                     }
                     map[(pix * width + x) as usize] |= 1 << i;
                 } else if palstate.is_none() {
@@ -968,7 +968,7 @@ impl<W: IoWrite> SixelOutput<W> {
             println!("\tpixelformat: {:?}", dither.pixelformat as i32);
         */
         if width < 1 {
-            return Err(Box::new(SixelError::BadInput));
+            return Err(SixelError::BadInput);
             /*
             sixel_helper_set_additional_message(
                 "sixel_encode: bad width parameter."
@@ -978,7 +978,7 @@ impl<W: IoWrite> SixelOutput<W> {
         }
 
         if height < 1 {
-            return Err(Box::new(SixelError::BadInput));
+            return Err(SixelError::BadInput);
             /*
             sixel_helper_set_additional_message(
                 "sixel_encode: bad height parameter."

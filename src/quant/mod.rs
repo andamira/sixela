@@ -8,7 +8,7 @@ use crate::{
     SixelDiffusion, SixelError, SixelResult,
 };
 use alloc::vec;
-use devela::{AllocMap as HashMap, Box, Ordering, Vec};
+use devela::{AllocMap as HashMap, Ordering, Vec};
 
 /// TODO
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -698,7 +698,7 @@ pub(crate) fn sixel_quant_apply_palette(
         // sixel_helper_set_additional_message(
         // "sixel_quant_apply_palette: "
         // "a bad argument is detected, reqcolor < 0.");
-        return Err(Box::new(SixelError::BadArgument));
+        return Err(SixelError::BadArgument);
     }
 
     let mut f_mask = false;
