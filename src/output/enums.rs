@@ -3,7 +3,7 @@
 // TOC
 // - enum LargestDim
 // - enum RepColor
-// - enum SixelDiffusion
+// - enum Diffusion
 // - enum Quality
 // - enum PixelFormat
 // - enum EncodePolicy
@@ -62,7 +62,7 @@ impl ConstDefault for RepColor { const DEFAULT: Self = Self::Auto; }
 /// - Derived from `methodForDiffuse` enum in the `libsixel` C library.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
-pub enum SixelDiffusion {
+pub enum Diffusion {
     /// Choose diffusion type automatically.
     #[default]
     Auto = 0,
@@ -84,7 +84,7 @@ pub enum SixelDiffusion {
     XDither = 8,
 }
 #[rustfmt::skip]
-impl ConstDefault for SixelDiffusion { const DEFAULT: Self = Self::Auto; }
+impl ConstDefault for Diffusion { const DEFAULT: Self = Self::Auto; }
 
 /// Quality modes.
 ///

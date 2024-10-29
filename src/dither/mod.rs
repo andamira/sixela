@@ -11,7 +11,7 @@ use devela::Vec;
 use crate::{
     pixelformat::sixel_helper_normalize_pixelformat,
     quant::{sixel_quant_apply_palette, sixel_quant_make_palette},
-    LargestDim, PixelFormat, Quality, RepColor, SixelDiffusion, SixelError, SixelResult,
+    Diffusion, LargestDim, PixelFormat, Quality, RepColor, SixelError, SixelResult,
     SIXEL_PALETTE_MAX,
 };
 
@@ -75,7 +75,7 @@ pub(crate) struct DitherConf {
     /// Method for choosing a color from the box.
     pub method_for_rep: RepColor,
     /// Method for diffusing
-    pub method_for_diffuse: SixelDiffusion,
+    pub method_for_diffuse: Diffusion,
     /// Quality of histogram.
     pub quality_mode: Quality,
     /// Background color.
@@ -114,7 +114,7 @@ impl DitherConf {
             bodyonly: false,
             method_for_largest: LargestDim::Norm,
             method_for_rep: RepColor::Center,
-            method_for_diffuse: SixelDiffusion::FS,
+            method_for_diffuse: Diffusion::FS,
             quality_mode,
             pixelformat: PixelFormat::RGB888,
         })
@@ -223,18 +223,18 @@ impl DitherConf {
         self.palette = buf;
         self.optimized = true;
         if self.origcolors <= self.reqcolors {
-            self.method_for_diffuse = SixelDiffusion::None;
+            self.method_for_diffuse = Diffusion::None;
         }
         Ok(())
     }
 
     /// Set diffusion method.
-    pub fn set_diffusion_method(&mut self, method: SixelDiffusion) {
-        self.method_for_diffuse = if matches!(method, SixelDiffusion::Auto) {
+    pub fn set_diffusion_method(&mut self, method: Diffusion) {
+        self.method_for_diffuse = if matches!(method, Diffusion::Auto) {
             if self.ncolors > 16 {
-                SixelDiffusion::FS
+                Diffusion::FS
             } else {
-                SixelDiffusion::Atkinson
+                Diffusion::Atkinson
             }
         } else {
             method

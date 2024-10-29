@@ -2,14 +2,14 @@
 //
 
 use crate::{
-    DitherConf, EncodePolicy, LargestDim, PixelFormat, Quality, RepColor, SixelDiffusion,
-    SixelError, SixelOutput, SixelResult,
+    Diffusion, DitherConf, EncodePolicy, LargestDim, PixelFormat, Quality, RepColor, SixelError,
+    SixelOutput, SixelResult,
 };
 use devela::{ConstDefault, String, ToString, Vec};
 
 /// A configurable sixel string builder from a slice of pixel data bytes.
 ///
-/// By default it assumes `RGB888` PixelFormat, and `Auto`matic `SixelDiffusion`,
+/// By default it assumes `RGB888` PixelFormat, and `Auto`matic `Diffusion`,
 /// `LargestDim`, `RepColor` and `Quality`.
 ///
 /// # Example
@@ -26,7 +26,7 @@ pub struct Sixel<'a> {
     pub width: i32,
     pub height: i32,
     pub format: PixelFormat,
-    pub diffuse: SixelDiffusion,
+    pub diffuse: Diffusion,
     pub largest: LargestDim,
     pub rep: RepColor,
     pub quality: Quality,
@@ -37,7 +37,7 @@ impl<'a> ConstDefault for Sixel<'a> {
         width: 0,
         height: 0,
         format: PixelFormat::DEFAULT,
-        diffuse: SixelDiffusion::DEFAULT,
+        diffuse: Diffusion::DEFAULT,
         largest: LargestDim::DEFAULT,
         rep: RepColor::DEFAULT,
         quality: Quality::DEFAULT,
@@ -127,7 +127,7 @@ impl<'a> Sixel<'a> {
     }
     /// Sets the method for diffusion.
     #[inline] #[must_use]
-    pub const fn diffuse(mut self, diffuse: SixelDiffusion) -> Self {
+    pub const fn diffuse(mut self, diffuse: Diffusion) -> Self {
         self.diffuse = diffuse; self
     }
     /// Sets the method for largest.
@@ -193,15 +193,15 @@ impl<'a> Sixel<'a> {
     add_method![rep_average, rep, RepColor::AverageColors];
     add_method![rep_pixels, rep, RepColor::AveragePixels];
     //
-    add_method![diffuse_auto, diffuse, SixelDiffusion::Auto];
-    add_method![diffuse_none, diffuse, SixelDiffusion::None];
-    add_method![diffuse_atkinson, diffuse, SixelDiffusion::Atkinson];
-    add_method![diffuse_fs, diffuse, SixelDiffusion::FS];
-    add_method![diffuse_jajuni, diffuse, SixelDiffusion::JaJuNi];
-    add_method![diffuse_stucki, diffuse, SixelDiffusion::Stucki];
-    add_method![diffuse_burkes, diffuse, SixelDiffusion::Burkes];
-    add_method![diffuse_adither, diffuse, SixelDiffusion::ADither];
-    add_method![diffuse_xdither, diffuse, SixelDiffusion::XDither];
+    add_method![diffuse_auto, diffuse, Diffusion::Auto];
+    add_method![diffuse_none, diffuse, Diffusion::None];
+    add_method![diffuse_atkinson, diffuse, Diffusion::Atkinson];
+    add_method![diffuse_fs, diffuse, Diffusion::FS];
+    add_method![diffuse_jajuni, diffuse, Diffusion::JaJuNi];
+    add_method![diffuse_stucki, diffuse, Diffusion::Stucki];
+    add_method![diffuse_burkes, diffuse, Diffusion::Burkes];
+    add_method![diffuse_adither, diffuse, Diffusion::ADither];
+    add_method![diffuse_xdither, diffuse, Diffusion::XDither];
     //
     add_method![quality_auto, quality, Quality::Auto];
     add_method![quality_high, quality, Quality::High];
@@ -222,7 +222,7 @@ impl<'a> Sixel<'a> {
 /// println!("{}", sixel_string(
 ///     IMAGE_HEX, 2, 2,
 ///     PixelFormat::RGB888,
-///     SixelDiffusion::Stucki,
+///     Diffusion::Stucki,
 ///     LargestDim::Auto,
 ///     RepColor::Auto,
 ///     Quality::Auto
@@ -234,7 +234,7 @@ fn sixel_string(
     width: i32,
     height: i32,
     pixelformat: PixelFormat,
-    method_for_diffuse: SixelDiffusion,
+    method_for_diffuse: Diffusion,
     method_for_largest: LargestDim,
     method_for_rep: RepColor,
     quality_mode: Quality,

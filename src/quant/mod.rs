@@ -4,8 +4,8 @@ mod diffuse_fns;
 use diffuse_fns::*;
 
 use crate::{
-    pixelformat::sixel_helper_compute_depth, LargestDim, PixelFormat, Quality, RepColor,
-    SixelDiffusion, SixelError, SixelResult,
+    pixelformat::sixel_helper_compute_depth, Diffusion, LargestDim, PixelFormat, Quality, RepColor,
+    SixelError, SixelResult,
 };
 use alloc::vec;
 use devela::{AllocMap as HashMap, Ordering, Vec};
@@ -688,7 +688,7 @@ pub(crate) fn sixel_quant_apply_palette(
     depth: i32,
     palette: &mut Vec<u8>,
     reqcolor: i32,
-    diffuse: SixelDiffusion,
+    diffuse: Diffusion,
     foptimize: bool,
     foptimize_palette: bool,
     complexion: i32,
@@ -709,17 +709,17 @@ pub(crate) fn sixel_quant_apply_palette(
         diffuse_none
     } else {
         match diffuse {
-            SixelDiffusion::Auto | SixelDiffusion::None => diffuse_none,
-            SixelDiffusion::Atkinson => diffuse_atkinson,
-            SixelDiffusion::FS => diffuse_fs,
-            SixelDiffusion::JaJuNi => diffuse_jajuni,
-            SixelDiffusion::Stucki => diffuse_stucki,
-            SixelDiffusion::Burkes => diffuse_burkes,
-            SixelDiffusion::ADither => {
+            Diffusion::Auto | Diffusion::None => diffuse_none,
+            Diffusion::Atkinson => diffuse_atkinson,
+            Diffusion::FS => diffuse_fs,
+            Diffusion::JaJuNi => diffuse_jajuni,
+            Diffusion::Stucki => diffuse_stucki,
+            Diffusion::Burkes => diffuse_burkes,
+            Diffusion::ADither => {
                 f_mask = true;
                 diffuse_none
             }
-            SixelDiffusion::XDither => {
+            Diffusion::XDither => {
                 f_mask = true;
                 diffuse_none
             }
@@ -769,7 +769,7 @@ pub(crate) fn sixel_quant_apply_palette(
                     let pos = y * width + x;
                     for d in 0..depth {
                         let mut val = data[(pos * depth + d) as usize] as i32;
-                        if matches!(diffuse, SixelDiffusion::ADither) {
+                        if matches!(diffuse, Diffusion::ADither) {
                             val += (mask_a(x, y, d) * 32.0) as i32;
                         } else {
                             val += (mask_x(x, y, d) * 32.0) as i32;
@@ -834,7 +834,7 @@ pub(crate) fn sixel_quant_apply_palette(
                     let pos = y * width + x;
                     for d in 0..depth {
                         let mut val = data[(pos * depth + d) as usize] as i32;
-                        if matches!(diffuse, SixelDiffusion::ADither) {
+                        if matches!(diffuse, Diffusion::ADither) {
                             val += (mask_a(x, y, d) * 32.0) as i32;
                         } else {
                             val += (mask_x(x, y, d) * 32.0) as i32;

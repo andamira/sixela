@@ -11,7 +11,7 @@
 // - fn dither_func_a_dither
 // - fn dither_func_x_dither
 
-use crate::SixelDiffusion;
+use crate::Diffusion;
 
 /// TODO
 pub(super) fn sixel_apply_15bpp_dither(
@@ -20,41 +20,41 @@ pub(super) fn sixel_apply_15bpp_dither(
     y: i32,
     width: i32,
     height: i32,
-    method_for_diffuse: SixelDiffusion,
+    method_for_diffuse: Diffusion,
 ) {
     match method_for_diffuse {
-        SixelDiffusion::None | SixelDiffusion::Auto => {
+        Diffusion::None | Diffusion::Auto => {
             dither_func_none(pixels, width);
         }
-        SixelDiffusion::Atkinson => {
+        Diffusion::Atkinson => {
             if x < width - 2 && y < height - 2 {
                 dither_func_atkinson(pixels, width);
             }
         }
-        SixelDiffusion::FS => {
+        Diffusion::FS => {
             if x < width - 1 && y < height - 1 {
                 dither_func_fs(pixels, width);
             }
         }
-        SixelDiffusion::JaJuNi => {
+        Diffusion::JaJuNi => {
             if x < width - 2 && y < height - 2 {
                 dither_func_jajuni(pixels, width);
             }
         }
-        SixelDiffusion::Stucki => {
+        Diffusion::Stucki => {
             if x < width - 2 && y < height - 2 {
                 dither_func_stucki(pixels, width);
             }
         }
-        SixelDiffusion::Burkes => {
+        Diffusion::Burkes => {
             if x < width - 2 && y < height - 1 {
                 dither_func_burkes(pixels, width);
             }
         }
-        SixelDiffusion::ADither => {
+        Diffusion::ADither => {
             dither_func_a_dither(pixels, width, x, y);
         }
-        SixelDiffusion::XDither => {
+        Diffusion::XDither => {
             dither_func_x_dither(pixels, width, x, y);
         }
     }
