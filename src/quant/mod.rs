@@ -4,7 +4,7 @@ mod diffuse_fns;
 use diffuse_fns::*;
 
 use crate::{
-    pixelformat::sixel_helper_compute_depth, MethodForLargest, MethodForRep, PixelFormat, Quality,
+    pixelformat::sixel_helper_compute_depth, LargestDim, PixelFormat, Quality, RepColor,
     SixelDiffusion, SixelError, SixelResult,
 };
 use alloc::vec;
@@ -191,25 +191,27 @@ fn average_pixels(
 }
 
 ///
-/// Ok, we've got enough boxes.  Now choose a representative color for
-/// each box.  There are a number of possible ways to make this choice.
-/// One would be to choose the center of the box; this ignores any structure
-/// within the boxes.  Another method would be to average all the colors in
-/// the box - this is the method specified in Heckbert's paper.  A third
-/// method is to average all the pixels in the box.
+/// Ok, we've got enough boxes. Now choose a representative color for each box.
+///
+/// There are a number of possible ways to make this choice.
+/// - One would be to choose the center of the box; this ignores any structure
+///   within the boxes.
+/// - Another method would be to average all the colors in the box.
+///   This is the method specified in Heckbert's paper.
+/// - A third method is to average all the pixels in the box.
 fn color_map_from_bv(
     newcolors: i32,
     bv: &[BBox],
     boxes: i32,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    rep: MethodForRep,
+    rep: RepColor,
 ) -> HashMap<i32, Tuple> {
     let mut colormap = new_color_map(newcolors, depth);
 
     for bi in 0..boxes {
         match rep {
-            MethodForRep::CenterBox => {
+            RepColor::Center => {
                 center_box(
                     bv[bi as usize].ind,
                     bv[bi as usize].colors,
@@ -218,7 +220,7 @@ fn color_map_from_bv(
                     &mut colormap.get_mut(&bi).unwrap().tuple,
                 );
             }
-            MethodForRep::AverageColors => {
+            RepColor::AverageColors => {
                 average_colors(
                     bv[bi as usize].ind,
                     bv[bi as usize].colors,
@@ -227,7 +229,7 @@ fn color_map_from_bv(
                     &mut colormap.get_mut(&bi).unwrap().tuple,
                 );
             }
-            MethodForRep::Auto | MethodForRep::Pixels => {
+            RepColor::Auto | RepColor::AveragePixels => {
                 average_pixels(
                     bv[bi as usize].ind,
                     bv[bi as usize].colors,
@@ -254,7 +256,7 @@ fn split_box(
     bi: usize,
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
-    _largest: MethodForLargest,
+    _largest: LargestDim,
 ) -> SixelResult<()> {
     let box_start = bv[bi].ind;
     let box_size = bv[bi].colors;
@@ -274,8 +276,8 @@ fn split_box(
        transforming into luminosities before the comparison.
     */
     // let _largest_dimension = match _largest {
-    //     MethodForLargest::Auto | MethodForLargest::Norm => largest_by_norm(&minval, &maxval, depth),
-    //     MethodForLargest::Lum => largest_by_luminosity(&minval, &maxval, depth),
+    //     LargestDim::Auto | LargestDim::Norm => largest_by_norm(&minval, &maxval, depth),
+    //     LargestDim::Lum => largest_by_luminosity(&minval, &maxval, depth),
     // };
 
     /* TODO: I think this sort should go after creating a box,
@@ -327,8 +329,8 @@ fn mediancut(
     colorfreqtable: &mut HashMap<i32, Tuple>,
     depth: i32,
     newcolors: i32,
-    largest: MethodForLargest,
-    rep: MethodForRep,
+    largest: LargestDim,
+    rep: RepColor,
     colormap: &mut HashMap<i32, Tuple>,
 ) -> SixelResult<()> {
     let mut sum = 0;
@@ -459,8 +461,8 @@ fn compute_color_map_from_input(
     length: i32,
     depth: i32,
     req_colors: i32,
-    largest: MethodForLargest,
-    rep: MethodForRep,
+    largest: LargestDim,
+    rep: RepColor,
     quality: Quality,
     colormap: &mut HashMap<i32, Tuple>,
     origcolors: &mut i32,
@@ -646,8 +648,8 @@ pub(crate) fn sixel_quant_make_palette(
     req_colors: i32,
     ncolors: &mut i32,
     origcolors: &mut i32,
-    largest: MethodForLargest,
-    rep: MethodForRep,
+    largest: LargestDim,
+    rep: RepColor,
     quality: Quality,
 ) -> SixelResult<Vec<u8>> {
     let result_depth = sixel_helper_compute_depth(pixelformat);

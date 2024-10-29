@@ -9,7 +9,7 @@ use devela::Vec;
 use crate::{
     pixelformat::sixel_helper_normalize_pixelformat,
     quant::{sixel_quant_apply_palette, sixel_quant_make_palette},
-    MethodForLargest, MethodForRep, PixelFormat, Quality, SixelDiffusion, SixelError, SixelResult,
+    LargestDim, PixelFormat, Quality, RepColor, SixelDiffusion, SixelError, SixelResult,
     SIXEL_PALETTE_MAX,
 };
 
@@ -69,9 +69,9 @@ pub struct DitherConf {
     /// Do not output palette section if true.
     pub bodyonly: bool,
     /// Method for finding the largest dimention for splitting.
-    pub method_for_largest: MethodForLargest,
+    pub method_for_largest: LargestDim,
     /// Method for choosing a color from the box.
-    pub method_for_rep: MethodForRep,
+    pub method_for_rep: RepColor,
     /// Method for diffusing
     pub method_for_diffuse: SixelDiffusion,
     /// Quality of histogram.
@@ -110,8 +110,8 @@ impl DitherConf {
             optimize_palette: false,
             complexion: 1,
             bodyonly: false,
-            method_for_largest: MethodForLargest::Norm,
-            method_for_rep: MethodForRep::CenterBox,
+            method_for_largest: LargestDim::Norm,
+            method_for_rep: RepColor::Center,
             method_for_diffuse: SixelDiffusion::FS,
             quality_mode,
             pixelformat: PixelFormat::RGB888,
@@ -142,18 +142,18 @@ impl DitherConf {
     }
 
     /// TODO
-    pub fn set_method_for_largest(&mut self, method_for_largest: MethodForLargest) {
-        self.method_for_largest = if matches!(method_for_largest, MethodForLargest::Auto) {
-            MethodForLargest::Norm
+    pub fn set_method_for_largest(&mut self, method_for_largest: LargestDim) {
+        self.method_for_largest = if matches!(method_for_largest, LargestDim::Auto) {
+            LargestDim::Norm
         } else {
             method_for_largest
         };
     }
 
     /// TODO
-    pub fn set_method_for_rep(&mut self, method_for_rep: MethodForRep) {
-        self.method_for_rep = if matches!(method_for_rep, MethodForRep::Auto) {
-            MethodForRep::CenterBox
+    pub fn set_method_for_rep(&mut self, method_for_rep: RepColor) {
+        self.method_for_rep = if matches!(method_for_rep, RepColor::Auto) {
+            RepColor::Center
         } else {
             method_for_rep
         };
@@ -180,8 +180,8 @@ impl DitherConf {
         width: i32,
         height: i32,
         pixelformat: PixelFormat,
-        method_for_largest: MethodForLargest,
-        method_for_rep: MethodForRep,
+        method_for_largest: LargestDim,
+        method_for_rep: RepColor,
         quality_mode: Quality,
     ) -> SixelResult<()> {
         self.set_pixelformat(pixelformat);

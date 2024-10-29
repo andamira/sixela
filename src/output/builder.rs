@@ -2,7 +2,7 @@
 //
 
 use crate::{
-    DitherConf, EncodePolicy, MethodForLargest, MethodForRep, PixelFormat, Quality, SixelDiffusion,
+    DitherConf, EncodePolicy, LargestDim, PixelFormat, Quality, RepColor, SixelDiffusion,
     SixelError, SixelOutput, SixelResult,
 };
 use devela::{ConstDefault, String, ToString, Vec};
@@ -10,7 +10,7 @@ use devela::{ConstDefault, String, ToString, Vec};
 /// A configurable sixel builder from a slice of pixel data.
 ///
 /// By default it assumes `RGB888` PixelFormat, and `Auto`matic `SixelDiffusion`,
-/// `MethodForLargest`, `MethodForRep` and `Quality`.
+/// `LargestDim`, `RepColor` and `Quality`.
 ///
 /// # Example
 /// ```
@@ -27,8 +27,8 @@ pub struct Sixel<'a> {
     pub height: i32,
     pub format: PixelFormat,
     pub diffuse: SixelDiffusion,
-    pub largest: MethodForLargest,
-    pub rep: MethodForRep,
+    pub largest: LargestDim,
+    pub rep: RepColor,
     pub quality: Quality,
 }
 impl<'a> ConstDefault for Sixel<'a> {
@@ -38,8 +38,8 @@ impl<'a> ConstDefault for Sixel<'a> {
         height: 0,
         format: PixelFormat::DEFAULT,
         diffuse: SixelDiffusion::DEFAULT,
-        largest: MethodForLargest::DEFAULT,
-        rep: MethodForRep::DEFAULT,
+        largest: LargestDim::DEFAULT,
+        rep: RepColor::DEFAULT,
         quality: Quality::DEFAULT,
     };
 }
@@ -132,12 +132,12 @@ impl<'a> Sixel<'a> {
     }
     /// Sets the method for largest.
     #[inline] #[must_use]
-    pub const fn largest(mut self, largest: MethodForLargest) -> Self {
+    pub const fn largest(mut self, largest: LargestDim) -> Self {
         self.largest = largest; self
     }
     /// Sets the method for rep.
     #[inline] #[must_use]
-    pub const fn rep(mut self, rep: MethodForRep) -> Self {
+    pub const fn rep(mut self, rep: RepColor) -> Self {
         self.rep = rep; self
     }
     /// Sets the quality.
@@ -184,14 +184,14 @@ impl<'a> Sixel<'a> {
     add_method![format_pal4, format, PixelFormat::PAL4];
     add_method![format_pal8, format, PixelFormat::PAL8];
     //
-    add_method![largest_auto, largest, MethodForLargest::Auto];
-    add_method![largest_norm, largest, MethodForLargest::Norm];
-    add_method![largest_lum, largest, MethodForLargest::Lum];
+    add_method![largest_auto, largest, LargestDim::Auto];
+    add_method![largest_norm, largest, LargestDim::Norm];
+    add_method![largest_lum, largest, LargestDim::Lum];
     //
-    add_method![rep_auto, rep, MethodForRep::Auto];
-    add_method![rep_center, rep, MethodForRep::CenterBox];
-    add_method![rep_average, rep, MethodForRep::AverageColors];
-    add_method![rep_pixels, rep, MethodForRep::Pixels];
+    add_method![rep_auto, rep, RepColor::Auto];
+    add_method![rep_center, rep, RepColor::Center];
+    add_method![rep_average, rep, RepColor::AverageColors];
+    add_method![rep_pixels, rep, RepColor::AveragePixels];
     //
     add_method![diffuse_auto, diffuse, SixelDiffusion::Auto];
     add_method![diffuse_none, diffuse, SixelDiffusion::None];
@@ -223,8 +223,8 @@ impl<'a> Sixel<'a> {
 ///     IMAGE_HEX, 2, 2,
 ///     PixelFormat::RGB888,
 ///     SixelDiffusion::Stucki,
-///     MethodForLargest::Auto,
-///     MethodForRep::Auto,
+///     LargestDim::Auto,
+///     RepColor::Auto,
 ///     Quality::Auto
 /// ).unwrap());
 /// ```
@@ -235,8 +235,8 @@ fn sixel_string(
     height: i32,
     pixelformat: PixelFormat,
     method_for_diffuse: SixelDiffusion,
-    method_for_largest: MethodForLargest,
-    method_for_rep: MethodForRep,
+    method_for_largest: LargestDim,
+    method_for_rep: RepColor,
     quality_mode: Quality,
 ) -> SixelResult<String> {
     let mut sixel_data: Vec<u8> = Vec::new(); // MAYBE with_capacity

@@ -1,8 +1,8 @@
 // sixela::output::enums
 //
 // TOC
-// - enum MethodForLargest
-// - enum MethodForRep
+// - enum LargestDim
+// - enum RepColor
 // - enum SixelDiffusion
 // - enum Quality
 // - enum PixelFormat
@@ -23,7 +23,7 @@ use devela::ConstDefault;
 /// - Derived from `methodForLargest` enum in the `libsixel` C library.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
-pub enum MethodForLargest {
+pub enum LargestDim {
     /// Choose automatically the method for finding the largest dimension. (default)
     #[default]
     Auto,
@@ -33,28 +33,28 @@ pub enum MethodForLargest {
     Lum,
 }
 #[rustfmt::skip]
-impl ConstDefault for MethodForLargest { const DEFAULT: Self = Self::Auto; }
+impl ConstDefault for LargestDim { const DEFAULT: Self = Self::Auto; }
 
-/// Method for choosing a color from the box.
+/// Method for choosing a representative color from the box.
 ///
 /// # Adaptation
 /// - Derived from `methodForRep` enum in the `libsixel` C library.
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
-pub enum MethodForRep {
+pub enum RepColor {
     /// Choose automatically the method for selecting representative color from each box.
     /// (default)
     #[default]
     Auto,
     /// Choose the center of the box.
-    CenterBox,
-    /// Choose the average all the color in the box (specified in Heckbert's paper).
+    Center,
+    /// Choose the average of all the colors in the box (specified in Heckbert's paper).
     AverageColors,
-    /// Choose the average all the pixels in the box.
-    Pixels,
+    /// Choose the average of all the pixels in the box.
+    AveragePixels,
 }
 #[rustfmt::skip]
-impl ConstDefault for MethodForRep { const DEFAULT: Self = Self::Auto; }
+impl ConstDefault for RepColor { const DEFAULT: Self = Self::Auto; }
 
 /// Method of diffusion.
 ///
