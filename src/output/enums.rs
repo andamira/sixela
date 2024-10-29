@@ -112,36 +112,87 @@ impl ConstDefault for Quality { const DEFAULT: Self = Self::Auto; }
 ///
 /// # Adaptation
 /// Derived from `pixelFormat` enum in the `libsixel` C library.
-//
-// NOTE: for compatibility, the value of PIXELFORMAT_COLOR_RGB888 must be 3
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub enum PixelFormat {
-    RGB555 = 1, // (SIXEL_FORMATTYPE_COLOR     | 0x01) /* 15bpp */
-    RGB565 = 2, // (SIXEL_FORMATTYPE_COLOR     | 0x02) /* 16bpp */
-    /// RGB 24bpp (Default).
+    /// RGB color 15bpp.
+    RGB555 = 1,
+    /// RGB color 16bpp.
+    RGB565 = 2,
+    /// RGB color 24bpp. (Default)
     #[default]
-    RGB888 = 3, // (SIXEL_FORMATTYPE_COLOR     | 0x03) /* 24bpp */
-    BGR555 = 4, // (SIXEL_FORMATTYPE_COLOR     | 0x04) /* 15bpp */
-    BGR565 = 5, // (SIXEL_FORMATTYPE_COLOR     | 0x05) /* 16bpp */
-    BGR888 = 6, // (SIXEL_FORMATTYPE_COLOR     | 0x06) /* 24bpp */
-    ARGB8888 = 0x10, // (SIXEL_FORMATTYPE_COLOR     | 0x10) /* 32bpp */
-    RGBA8888 = 0x11, // (SIXEL_FORMATTYPE_COLOR     | 0x11) /* 32bpp */
-    ABGR8888 = 0x12, // (SIXEL_FORMATTYPE_COLOR     | 0x12) /* 32bpp */
-    BGRA8888 = 0x13, // (SIXEL_FORMATTYPE_COLOR     | 0x13) /* 32bpp */
-    G1 = (1 << 6), // (SIXEL_FORMATTYPE_GRAYSCALE | 0x00) /* 1bpp grayscale */
-    G2 = (1 << 6) | 0x01, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x01) /* 2bpp grayscale */
-    G4 = (1 << 6) | 0x02, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x02) /* 4bpp grayscale */
-    G8 = (1 << 6) | 0x03, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x03) /* 8bpp grayscale */
-    AG88 = (1 << 6) | 0x13, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x13) /* 16bpp gray+alpha */
-    GA88 = (1 << 6) | 0x23, // (SIXEL_FORMATTYPE_GRAYSCALE | 0x23) /* 16bpp gray+alpha */
-    PAL1 = (1 << 7), // (SIXEL_FORMATTYPE_PALETTE   | 0x00) /* 1bpp palette */
-    PAL2 = (1 << 7) | 0x01, // (SIXEL_FORMATTYPE_PALETTE   | 0x01) /* 2bpp palette */
-    PAL4 = (1 << 7) | 0x02, // (SIXEL_FORMATTYPE_PALETTE   | 0x02) /* 4bpp palette */
-    PAL8 = (1 << 7) | 0x03, // (SIXEL_FORMATTYPE_PALETTE   | 0x03) /* 8bpp palette */
+    RGB888 = 3, // for compatibility, the value must be 3.
+    /// BGR color 15bpp.
+    BGR555 = 4,
+    /// BGR color 16bpp.
+    BGR565 = 5,
+    /// BGR color 24bpp.
+    BGR888 = 6,
+    /// ARGB color 32bpp.
+    ARGB8888 = 0x10,
+    /// RGBA color 32bpp.
+    RGBA8888 = 0x11,
+    /// ABGR color 32bpp.
+    ABGR8888 = 0x12,
+    /// BGRA color 32bpp.
+    BGRA8888 = 0x13,
+    /// Grayscale 1bpp.
+    G1 = (1 << 6),
+    /// Grayscale 2bpp.
+    G2 = (1 << 6) | 0x01,
+    /// Grayscale 4bpp.
+    G4 = (1 << 6) | 0x02,
+    /// Grayscale 8bpp.
+    G8 = (1 << 6) | 0x03,
+    /// AG grayscale 16bpp.
+    AG88 = (1 << 6) | 0x13,
+    /// GA grayscale 16bpp.
+    GA88 = (1 << 6) | 0x23,
+    /// Palette 1bpp.
+    PAL1 = (1 << 7),
+    /// Palette 2bpp.
+    PAL2 = (1 << 7) | 0x01,
+    /// Palette 4bpp.
+    PAL4 = (1 << 7) | 0x02,
+    /// Palette 8bpp.
+    PAL8 = (1 << 7) | 0x03,
 }
 #[rustfmt::skip]
 impl ConstDefault for PixelFormat { const DEFAULT: Self = Self::RGB888; }
+
+impl PixelFormat {
+    /// Returns the bits per pixel of the current format.
+    #[rustfmt::skip]
+    pub const fn bpp(self) -> usize {
+        match self {
+            PixelFormat::RGB555
+            | PixelFormat::BGR555 => 15,
+            PixelFormat::RGB565
+            | PixelFormat::BGR565
+            | PixelFormat::AG88
+            | PixelFormat::GA88 => 16,
+            PixelFormat::RGB888
+            | PixelFormat::BGR888
+            | PixelFormat::G8
+            | PixelFormat::PAL8 => 24,
+            PixelFormat::ARGB8888
+            | PixelFormat::RGBA8888
+            | PixelFormat::ABGR8888
+            | PixelFormat::BGRA8888 => 32,
+            PixelFormat::G1 | PixelFormat::PAL1 => 1,
+            PixelFormat::G2 | PixelFormat::PAL2 => 2,
+            PixelFormat::G4 | PixelFormat::PAL4 => 4,
+        }
+    }
+
+    /// Returns the number of bytes required to store an image of the given dimensions,
+    /// using the current pixel format.
+    pub const fn required_bytes(self, width: i32, height: i32) -> usize {
+        let total_bits = width as usize * height as usize * self.bpp();
+        // FIX: devela::bytes_from_bits(total_bits)
+        (total_bits + 7) / 8
+    }
+}
 
 /// Policies of SIXEL encoding.
 ///
